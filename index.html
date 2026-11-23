@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1120">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Paul's English School</title>
+
+<link rel="icon" href="icon-192.png">
+</head><body>
+<!-- ============================================================================
+     THE PAUL'S ENGLISH SCHOOL — ENTERPRISE SCHOOL MANAGEMENT PORTAL (BLOGGER)
+     ============================================================================
+     FULL & FINAL SINGLE-FILE GADGET:
+     - Readmission tab removed; Enrollment supports Current & Future sessions
+     - Enrollment includes UDISE Code, Father's Aadhaar Card & Mother's Aadhaar Card
+     - Google Sheet Live Cloud Sync (Apps Script Web App URL + Secret Sync Key)
+     - Cell-level marks locking + Admin unlock override
+     - Role-based staff user permissions + A4 Portrait Marksheet / A5 Admit Card print
+     ============================================================================ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style id="page_style">@page{size:A4 portrait;margin:6mm}</style>
+
+<style>
+/* ============================================================================
+   GLOBAL THEME, GLASSMORPHISM & KEYFRAME ANIMATIONS
+   ============================================================================ */
+:root{
+  --bg:#0b1120;
+  --bg-grad:radial-gradient(circle at 12% 18%, rgba(79,70,229,0.28) 0%, transparent 42%),
+            radial-gradient(circle at 88% 12%, rgba(6,182,212,0.24) 0%, transparent 40%),
+            radial-gradient(circle at 50% 90%, rgba(16,185,129,0.16) 0%, transparent 45%),
+            #0b1120;
+  --c:rgba(30,41,59,0.68);
+  --c-solid:#1e293b;
+  --t:#f8fafc;
+  --m:#94a3b8;
+  --a:#6366f1;
+  --a2:#06b6d4;
+  --b:rgba(148,163,184,0.22);
+  --glass-shadow:0 8px 32px rgba(2,6,23,0.45);
+  --grad:linear-gradient(135deg,#4f46e5 0%,#0ea5e9 55%,#06b6d4 100%);
+  --font-head:'Outfit',system-ui,sans-serif;
+  --font-body:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+}
+body.light{
+  --bg:#eef2f6;
+  --bg-grad:radial-gradient(circle at 10% 15%, rgba(79,70,229,0.12) 0%, transparent 45%),
+            radial-gradient(circle at 90% 10%, rgba(6,182,212,0.14) 0%, transparent 45%),
+            #eef2f6;
+  --c:rgba(255,255,255,0.82);
+  --c-solid:#ffffff;
+  --t:#0f172a;
+  --m:#475569;
+  --a:#4f46e5;
+  --a2:#0284c7;
+  --b:rgba(15,23,42,0.12);
+  --glass-shadow:0 8px 28px rgba(15,23,42,0.08);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:14px;
+  background:var(--bg);
+  background-image:var(--bg-grad);
+  background-attachment:fixed;
+  color:var(--t);
+  font:14px/1.5 var(--font-body);
+  transition:background .3s ease,color .3s ease;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+.ambient-orb{
+  position:fixed;border-radius:50%;filter:blur(70px);z-index:-1;pointer-events:none;opacity:0.45;
+  animation:floatOrb 14s ease-in-out infinite alternate;
+}
+.orb-1{width:320px;height:320px;background:#4f46e5;top:-60px;left:-60px}
+.orb-2{width:280px;height:280px;background:#06b6d4;bottom:-50px;right:-40px;animation-delay:-5s}
+@keyframes floatOrb{
+  0%{transform:translate(0,0) scale(1)}
+  100%{transform:translate(35px,25px) scale(1.12)}
+}
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.4)}
+  50%{box-shadow:0 0 18px 2px rgba(6,182,212,0.35)}
+}
+
+.header-card{
+  background:var(--grad);
+  color:#fff;
+  padding:16px 22px;
+  border-radius:18px;
+  margin-bottom:14px;
+  box-shadow:0 10px 28px rgba(79,70,229,0.32);
+  border:1px solid rgba(255,255,255,0.22);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  position:relative;
+  overflow:hidden;
+}
+.header-card::after{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);
+  transform:skewX(-20deg);animation:headerShine 7s infinite;
+}
+@keyframes headerShine{0%,65%{left:-100%}100%{left:160%}}
+.header-card h1{margin:0;font-family:var(--font-head);font-size:clamp(18px,2.4vw,23px);font-weight:800;letter-spacing:-0.3px}
+.hdr-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;z-index:1}
+
+.tabs{display:flex;gap:7px;overflow-x:auto;margin-bottom:14px;padding:4px 2px 8px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{height:5px}
+.tabs::-webkit-scrollbar-thumb{background:var(--b);border-radius:99px}
+.tabs button{
+  padding:9px 15px;
+  border:1px solid var(--b);
+  background:var(--c);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  color:var(--t);
+  border-radius:11px;
+  white-space:nowrap;
+  cursor:pointer;
+  font-family:var(--font-head);
+  font-weight:600;
+  font-size:13px;
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+}
+.tabs button:hover{transform:translateY(-2px);border-color:var(--a)}
+.tabs button.on{
+  background:var(--grad);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 14px rgba(79,70,229,0.4);
+}
+
+.box{
+  background:var(--c);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--b);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:var(--glass-shadow);
+  animation:fadeSlideUp .35s ease both;
+}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}
+label{font-size:11.5px;color:var(--m);display:block;font-weight:600;margin-bottom:4px;letter-spacing:0.2px}
+input,select{
+  width:100%;padding:9px 12px;border:1px solid var(--b);border-radius:9px;
+  background:rgba(15,23,42,0.35);color:var(--t);font-size:13.5px;font-family:var(--font-body);
+  transition:all .2s;
+}
+body.light input,body.light select{background:rgba(255,255,255,0.9)}
+input:focus,select:focus{outline:none;border-color:var(--a2);box-shadow:0 0 0 3px rgba(6,182,212,0.2)}
+select option{background:var(--c-solid);color:var(--t)}
+
+.btn{
+  padding:10px 18px;border:0;border-radius:10px;background:var(--grad);color:#fff;
+  margin:10px 6px 0 0;font-size:13.5px;cursor:pointer;font-family:var(--font-head);font-weight:600;
+  box-shadow:0 4px 12px rgba(79,70,229,0.3);transition:all .2s;
+}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn.g2{background:transparent;color:var(--t);border:1px solid var(--b);box-shadow:none}
+.btn.g2:hover{background:rgba(99,102,241,0.12);border-color:var(--a)}
+.mb{padding:5px 11px;border:1px solid var(--b);background:rgba(255,255,255,0.06);color:var(--t);border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.mb:hover{background:rgba(99,102,241,0.18)}
+.mb.d{color:#f87171;border-color:rgba(248,113,113,0.4)}
+
+.sc{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--b);white-space:nowrap}
+th{background:rgba(99,102,241,0.14);color:var(--a2);font-family:var(--font-head);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:0.3px}
+.mi{width:56px;padding:6px 4px;text-align:center;font-weight:600}
+.mi.cell-locked{
+  background:rgba(239,68,68,0.14)!important;
+  border-color:rgba(239,68,68,0.45)!important;
+  color:var(--t)!important;
+  cursor:not-allowed;
+}
+.avatar{width:46px;height:54px;object-fit:cover;border:1px solid var(--b);border-radius:8px}
+
+/* ============================================================================
+   EXECUTIVE DASHBOARD WIDGETS
+   ============================================================================ */
+.dash-hero{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px}
+.user-glass-card{
+  background:linear-gradient(135deg,rgba(79,70,229,0.25),rgba(6,182,212,0.18));
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:16px;padding:18px;display:flex;align-items:center;gap:16px;
+  backdrop-filter:blur(16px);box-shadow:var(--glass-shadow);animation:pulseGlow 5s infinite;
+}
+.user-avatar-ring{
+  width:74px;height:74px;border-radius:50%;padding:3px;
+  background:var(--grad);flex-shrink:0;box-shadow:0 4px 15px rgba(6,182,212,0.4);
+}
+.user-avatar-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#0f172a}
+.badge-pill{
+  display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;
+  background:rgba(6,182,212,0.2);color:#38bdf8;border:1px solid rgba(56,189,248,0.35);
+}
+body.light .badge-pill{color:#0369a1}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+.kpi-card{
+  background:var(--c);backdrop-filter:blur(14px);border:1px solid var(--b);
+  border-radius:16px;padding:16px;position:relative;overflow:hidden;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.kpi-card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(6,182,212,0.18)}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent,var(--a));
+}
+.kpi-top{display:flex;justify-content:space-between;align-items:center}
+.kpi-title{font-size:11.5px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:0.5px}
+.kpi-val{font-family:var(--font-head);font-size:28px;font-weight:800;margin:6px 0 4px}
+.kpi-sub{font-size:11.5px;color:var(--m)}
+
+.gauge-box{display:flex;align-items:center;gap:14px}
+.gauge-svg{width:68px;height:68px;transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:rgba(148,163,184,0.2);stroke-width:7}
+.gauge-fill{fill:none;stroke:var(--gcol,#06b6d4);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:150px;padding:14px 8px 4px;border-bottom:1px solid var(--b)}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:28px}
+.bar-fill{
+  width:100%;max-width:34px;border-radius:6px 6px 2px 2px;
+  background:var(--grad);transition:height .8s cubic-bezier(.34,1.56,.64,1);
+  position:relative;min-height:4px;
+}
+.bar-num{font-size:10.5px;font-weight:700;color:var(--a2)}
+.bar-lbl{font-size:10px;color:var(--m);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46px}
+
+.perm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:8px}
+.perm-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;
+  border:1px solid var(--b);background:rgba(255,255,255,0.03);cursor:pointer;font-size:12.5px;font-weight:600;
+}
+.perm-item input{width:auto;margin:0;accent-color:var(--a)}
+
+.stu-preview{
+  margin-top:12px;padding:12px 14px;border-radius:12px;
+  background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.35);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+
+/* ============================================================================
+   A4 PORTRAIT MARKSHEET STYLING
+   ============================================================================ */
+.ms{
+  background:#fff;color:#000;border:3px double #0d3a8c;padding:8mm 9mm;
+  width:196mm;height:273mm;margin:0 auto 16px;
+  font:11px/1.3 Arial,Helvetica,sans-serif;
+  display:flex;flex-direction:column;justify-content:space-between;
+  box-sizing:border-box;overflow:hidden;
+  break-inside:avoid;break-after:page;page-break-after:always;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.ms-hd{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:3px}
+.ms-logo{width:58px;height:58px;object-fit:contain;flex-shrink:0}
+.ms-hd-txt{text-align:center;color:#0d3a8c}
+.ms-hd-txt h1{margin:0;font:italic 700 24px Georgia,serif;color:#0d3a8c}
+.ms-hd-txt .sub{font-weight:700;font-size:10.5px;line-height:1.38;color:#0d3a8c}
+.ms table{width:100%;border-collapse:collapse;margin:3px 0;table-layout:auto}
+.ms td,.ms th{border:1px solid #000;padding:3px 3px;text-align:center;color:#000;font-size:10.5px;word-break:normal;overflow-wrap:normal}
+.ms th{background:#0070c0;color:#fff;font-weight:700;font-size:9.8px;line-height:1.2}
+.ms th.nw,.ms td.nw{white-space:nowrap!important}
+.ms .tl{text-align:left;padding-left:6px}.ms .lt{background:#d9edf7;text-align:left;padding-left:6px}
+.ms .sn{background:#d9edf7;text-align:left;font-weight:600;padding-left:5px;white-space:normal}
+.ms .mx{background:#d9edf7;font-weight:700;white-space:nowrap}
+.ms .sm{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:nowrap;margin:4px 0}
+.ms .sm-item{display:flex;align-items:center}
+.ms .sm-item span{background:#0070c0;color:#fff;padding:4px 8px;font-weight:700;font-size:10.5px;white-space:nowrap}
+.ms .sm-item b{background:#d9edf7;color:#000;padding:4px 10px;min-width:46px;text-align:center;font-size:11px;white-space:nowrap}
+.ms-sig{display:flex;justify-content:space-between;padding:0 16px;margin-top:22px;font-weight:700;font-size:11px;color:#000}
+.ms-sig span{border-top:1.5px solid #000;padding:4px 18px 0;text-align:center;white-space:nowrap}
+
+/* ============================================================================
+   A5 LANDSCAPE ADMIT CARD STYLING
+   ============================================================================ */
+.adm-wrap{display:flex;flex-direction:column;gap:16px;align-items:center}
+.adm{background:#fff;color:#000;border:2.5px solid #1b4f9c;border-radius:12px;padding:12px 18px;width:210mm;height:148mm;font:12px/1.35 'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;justify-content:space-between;break-inside:avoid;break-after:page;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.adm-top{display:flex;align-items:center;gap:14px}
+.adm-logo{width:60px;height:60px;object-fit:contain;flex-shrink:0}
+.adm-title-box{flex:1;text-align:center}
+.adm-title-box h2{margin:0;font-size:20px;font-weight:800;color:#1b4f9c;letter-spacing:.4px}
+.adm-title-box .adm-sub{font-size:11px;color:#333;margin:2px 0 4px;font-weight:600}
+.adm-pill{display:inline-block;background:#1b4f9c;color:#fff;font-weight:700;font-size:11.5px;padding:4px 18px;border-radius:6px;text-transform:uppercase}
+.adm-mid{display:flex;gap:16px;align-items:stretch;margin:4px 0}
+.adm-info{flex:1;border-collapse:collapse}
+.adm-info td{padding:3px 8px;font-size:12px;color:#000;border:0}
+.adm-info tr:nth-child(odd) td{background:#edf2f9}
+.adm-info tr:nth-child(even) td{background:#f8fafc}
+.adm-info td:first-child{font-weight:700;width:35%}
+.adm-photo{width:90px;height:110px;border:1.5px solid #1b4f9c;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f4f6fa;flex-shrink:0}
+.adm-photo img{width:100%;height:100%;object-fit:cover}
+.adm-inst{font-size:10px;color:#111;background:#f8fafc;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1}
+.adm-inst b{display:inline-block;border-bottom:1px solid #111;margin-bottom:2px;font-size:10px}
+.adm-inst ul{margin:2px 0 0;padding-left:14px;line-height:1.3}
+.adm-sig{display:flex;justify-content:space-between;padding:0 10px;margin-top:14px;font-size:11px;font-weight:600;color:#000}
+.adm-sig span{border-top:1px solid #000;padding:3px 14px 0}
+
+/* ============================================================================
+   MODAL & RESPONSIVE MEDIA QUERIES
+   ============================================================================ */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,6,23,0.82);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal{background:var(--c-solid);padding:28px;border-radius:20px;width:100%;max-width:420px;box-shadow:0 20px 45px rgba(0,0,0,0.5);border:1px solid var(--b);animation:fadeSlideUp .3s ease}
+
+@media(max-width:860px){
+  .dash-hero{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  body{padding:8px}
+  .header-card{padding:14px 16px;flex-direction:column;align-items:flex-start}
+  .hdr-actions{width:100%;justify-content:space-between}
+  .box{padding:14px}
+  .g{grid-template-columns:1fr}
+  .btn{width:100%;margin:6px 0 0 0;text-align:center}
+}
+
+@media print{
+  html,body{background:#fff!important;background-image:none!important;color:#000!important;padding:0!important;margin:0!important}
+  .no,.ambient-orb{display:none!important}
+  .sc{overflow:visible!important}
+  .ms{margin:0 auto!important;width:196mm!important;height:273mm!important;page-break-after:always;break-after:page}
+  .ms:last-child{page-break-after:auto;break-after:auto}
+  .adm{margin:0!important;width:198mm!important;height:136mm!important;border:2px solid #000}
+}
+</style>
+
+<div class="ambient-orb orb-1"></div>
+<div class="ambient-orb orb-2"></div>
+
+<div id="auth_box" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <h2 style="margin-top:0;font-family:var(--font-head);color:var(--a2);display:flex;align-items:center;gap:8px" id="auth_title">System Login</h2>
+    <p style="color:var(--m);font-size:13px;margin-bottom:16px">Sign in with your assigned Staff ID / Username and Password.</p>
+    <label>Username / Staff ID</label>
+    <input id="login_user" placeholder="e.g. admin or E001" style="margin-bottom:12px" onkeydown="if(event.key==='Enter')verifyLogin()" />
+    <label>Password</label>
+    <input id="login_pass" type="password" placeholder="Enter password" style="margin-bottom:20px" onkeydown="if(event.key==='Enter')verifyLogin()" />
+    <button class="btn" onclick="verifyLogin()" style="width:100%">Authenticate &amp; Enter Portal</button>
+  </div>
+</div>
+
+<div class="no">
+  <div class="header-card">
+    <div>
+      <h1 id="app_title">The Paul's English School Management</h1>
+      <div id="clock_lbl" style="font-size:12px;opacity:0.92;margin-top:3px;font-weight:500"></div>
+    </div>
+    <div class="hdr-actions">
+      <span id="sy" style="font-size:12px;font-weight:600;background:rgba(255,255,255,0.18);padding:5px 11px;border-radius:8px;backdrop-filter:blur(6px)"></span>
+      <button class="mb" id="theme_btn" onclick="toggleTheme()" style="background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.35)"></button>
+      <button class="mb" id="sync_btn" onclick="syncNow()" style="background:#fff;color:#4f46e5;border:0;font-weight:700"></button>
+      <span style="font-size:12px;background:rgba(0,0,0,0.2);padding:5px 10px;border-radius:8px">User: <b id="lbl_user">admin</b> (<span id="lbl_role">ADMIN</span>)</span>
+      <button class="mb" onclick="logout()" style="background:#ef4444;color:#fff;border:0">Logout</button>
+    </div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</div>
+<div id="v"></div>
+
+<script>
+var ICONS = {
+  school: '\uD83C\uDFEB',
+  lock: '\uD83D\uDD12',
+  unlock: '\uD83D\uDD13',
+  check: '\u2714',
+  sun: '\u2600\uFE0F',
+  moon: '\uD83C\uDF19',
+  sync: '\u21BB',
+  warn: '\u26A0\uFE0F',
+  wait: '\u23F3',
+  cam: '\uD83D\uDCF7',
+  search: '\uD83D\uDD0D',
+  print: '\uD83D\uDDA8\uFE0F',
+  chart: '\uD83D\uDCCA',
+  shield: '\uD83D\uDEE1\uFE0F'
+};
+
+var K='school_v8', T='hm', ED=null, ED_USER=null, M={s:'',c:'0',id:''};
+var DEFAULT_SESSIONS=['2025-26','2026-27','2027-28','2028-29','2029-30'];
+var DEFAULT_ROLES=['Director','Principal','Vice-Principal','Teacher-in-Charge','Assistant Teacher','Co-Ordinator','Accountant','Office Clerk','Librarian','Lab Assistant','Nanny','Security','Driver'];
+var ALL_TAB_DEFS=[
+  ['hm','Home Dashboard'],
+  ['st','Students'],
+  ['en','Enrollment'],
+  ['mk','Marks'],
+  ['ms','Marksheet'],
+  ['ms1','Term 1 Marksheet'],
+  ['ad','Admit Card'],
+  ['em','Staff'],
+  ['us','User Management'],
+  ['se','Settings']
+];
+var ALL_TAB_KEYS=ALL_TAB_DEFS.map(function(x){return x[0]});
+
+var DEFAULT_LOGO="data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#fff" stroke="#0d3a8c" stroke-width="5"/><circle cx="60" cy="60" r="46" fill="none" stroke="#c0392b" stroke-width="4"/><circle cx="60" cy="60" r="36" fill="#1b4f9c"/><rect x="42" y="45" width="36" height="26" rx="3" fill="#fff"/><line x1="60" y1="45" x2="60" y2="71" stroke="#1b4f9c" stroke-width="2"/><text x="60" y="21" font-size="8.5" font-family="Arial" font-weight="bold" fill="#0d3a8c" text-anchor="middle">THE PAUL\'S</text><text x="60" y="106" font-size="7.5" font-family="Arial" font-weight="bold" fill="#0d3a8c" text-anchor="middle">ENGLISH SCHOOL</text></svg>');
+var DEFAULT_AVATAR="data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e293b"/><circle cx="50" cy="36" r="18" fill="#6366f1"/><path d="M20 88c0-17 13-28 30-28s30 11 30 28" fill="#06b6d4"/></svg>');
+
+var D={
+  set:{school:'THE PAUL\u2019S ENGLISH SCHOOL',addr:'Kharibari, Mubarak Market, Kolkata- 700128, West Bengal',web:'www.thepaulsenglishschool.in | tpes.ofc@gmail.com',ph:'+91 89611 79951',ses:'2026-27',exam:'Half-Yearly Examination',ex_date:'14th Sept. to 29th Sept. 2026',ex_time:'11:30 a.m to 2:00 p.m',logo:''},
+  st:[],
+  en:[],
+  mk:{},
+  co:[],
+  em:[],
+  mk_audit:{},
+  users:{'admin':{pass:'admin123',role:'admin',staffId:'',tabs:ALL_TAB_KEYS.slice()}},
+  sessions:DEFAULT_SESSIONS.slice(),
+  roles:DEFAULT_ROLES.slice()
+};
+
+try{
+  var r0=localStorage.getItem(K) || localStorage.getItem('school_v7');
+  if(r0){
+    var X=JSON.parse(r0);
+    D.set=Object.assign(D.set,X.set||{});
+    ['st','en','mk','co','em','mk_audit','users','sessions','roles'].forEach(function(k){if(X[k])D[k]=X[k]});
+  }
+}catch(e){}
+
+function ensureDefaults(){
+  if(!Array.isArray(D.sessions) || !D.sessions.length) D.sessions = DEFAULT_SESSIONS.slice();
+  if(!D.set.ses || D.sessions.indexOf(D.set.ses)===-1) D.set.ses = '2026-27';
+  if(!Array.isArray(D.roles) || !D.roles.length) D.roles = DEFAULT_ROLES.slice();
+  if(!D.users || typeof D.users!=='object') D.users={};
+  if(!D.users.admin) D.users.admin={pass:'admin123',role:'admin',staffId:'',tabs:ALL_TAB_KEYS.slice()};
+  Object.keys(D.users).forEach(function(u){
+    if(!Array.isArray(D.users[u].tabs)){
+      D.users[u].tabs = (D.users[u].role==='admin') ? ALL_TAB_KEYS.slice() : ['hm','mk'];
+    } else {
+      var mapped=D.users[u].tabs.map(function(tb){return (tb==='en_new'||tb==='en_re')?'en':tb});
+      D.users[u].tabs=mapped.filter(function(item,pos){return mapped.indexOf(item)===pos});
+    }
+  });
+}
+ensureDefaults();
+
+function applyThemeUI(){
+  var isLight=document.body.classList.contains('light');
+  if($('theme_btn')) $('theme_btn').textContent = isLight ? (ICONS.moon+' Dark') : (ICONS.sun+' Light');
+}
+function toggleTheme(){
+  var isLight=document.body.classList.toggle('light');
+  localStorage.setItem('school_theme',isLight?'light':'dark');
+  applyThemeUI();
+}
+if(localStorage.getItem('school_theme')==='light'){
+  document.body.classList.add('light');
+}
+
+var CURRENT_USER = null;
+
+// YOUR GOOGLE SHEET CLOUD SYNC SETTINGS
+var SY = {
+  url: 'https://script.google.com/macros/s/AKfycbxLpae8huYiI00JGPKQmPZfbqqwfokHXd3SM46ZhafXtbeTTOPbhU5lOjRYYJZkP-wI/exec',
+  key: 'iambokachoda@1764#iambokachoda'
+};
+
+var DIRTY = {}, busy = 0, tm = 0;
+
+try {
+  DIRTY = JSON.parse(
+    localStorage.getItem('school_dirty') || '{}'
+  );
+} catch(e) {}
+
+function sd(){try{localStorage.setItem('school_dirty',JSON.stringify(DIRTY))}catch(e){}}
+function stat(m){var s=$('sy');if(s)s.textContent=m}
+function save(t){
+  try{localStorage.setItem(K,JSON.stringify(D))}catch(e){}
+  if(t&&SY.url){
+    t.forEach(function(k){DIRTY[k]=(DIRTY[k]||0)+1});
+    sd();clearTimeout(tm);stat(ICONS.wait+' Saving...');tm=setTimeout(push,1400);
+  }
+}
+
+async function push(){
+  var ks=Object.keys(DIRTY);if(!SY.url||!ks.length)return;
+  if(busy){clearTimeout(tm);tm=setTimeout(push,1400);return}
+  busy=1;
+  var snap={},body={key:SY.key,tables:{}},ok=false;
+  ks.forEach(function(k){snap[k]=DIRTY[k];body.tables[k]=D[k]});
+  try{
+    var r=await fetch(SY.url,{method:'POST',body:JSON.stringify(body)}),j=await r.json();
+    if(j.ok){
+      ok=true;ks.forEach(function(k){if(DIRTY[k]==snap[k])delete DIRTY[k]});
+      sd();stat(ICONS.check+' Synced');
+    }else stat(ICONS.warn+' '+j.error);
+  }catch(e){stat(ICONS.warn+' Offline')}
+  busy=0;if(ok&&Object.keys(DIRTY).length)push();
+}
+
+async function pull(){
+  if(!SY.url)return;
+  stat(ICONS.wait+' Loading...');
+  try{
+    var r=await fetch(SY.url+'?key='+encodeURIComponent(SY.key)),j=await r.json();
+    if(!j.ok){stat(ICONS.warn+' '+j.error);return}
+    var d=j.data;
+    ['set','st','en','mk','co','em','mk_audit','users','sessions','roles'].forEach(function(k){
+      if(DIRTY[k])return;
+      if(k=='set')D.set=Object.assign(D.set,d.set||{});
+      else if(d[k])D[k]=d[k];
+    });
+    ensureDefaults();
+    try{localStorage.setItem(K,JSON.stringify(D))}catch(e){}
+    stat(ICONS.check+' Synced');
+  }catch(e){stat(ICONS.warn+' Offline')}
+}
+
+async function syncNow(){await push();await pull();go(T)}
+
+var idleTimer=null;
+function resetIdleTimer(){
+  clearTimeout(idleTimer);
+  if(CURRENT_USER){
+    idleTimer=setTimeout(function(){
+      alert('Session expired due to inactivity. Please log in again.');
+      logout();
+    }, 30*60*1000);
+  }
+}
+['click','keydown','mousemove','touchstart'].forEach(function(ev){
+  window.addEventListener(ev,resetIdleTimer,{passive:true});
+});
+
+async function boot(){
+  $('app_title').textContent = ICONS.school + " The Paul's English School Management";
+  $('auth_title').textContent = ICONS.lock + ' Secure Portal Login';
+  $('sync_btn').textContent = ICONS.sync + ' Sync';
+  stat(SY.url ? (ICONS.check+' Ready') : 'Local Mode');
+  applyThemeUI();
+  setInterval(function(){
+    var d=new Date();
+    if($('clock_lbl')) $('clock_lbl').textContent=d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})+'  |  '+d.toLocaleTimeString();
+  },1000);
+  checkAuth();
+  if(!SY.url)return;
+  await push();await pull();go(T);setInterval(push,30000);
+}
+
+function checkAuth(){
+  var ses=sessionStorage.getItem('school_user_v8');
+  if(!ses){
+    $('auth_box').style.display='flex';
+    return;
+  }
+  CURRENT_USER=JSON.parse(ses);
+  var uRec=D.users[CURRENT_USER.username];
+  if(uRec){
+    CURRENT_USER.role=uRec.role;
+    CURRENT_USER.staffId=uRec.staffId||'';
+    CURRENT_USER.tabs=uRec.tabs||ALL_TAB_KEYS.slice();
+  }
+  $('lbl_role').textContent=(CURRENT_USER.role||'user').toUpperCase();
+  $('lbl_user').textContent=CURRENT_USER.username;
+  $('auth_box').style.display='none';
+  resetIdleTimer();
+  renderTabs();
+  go('hm');
+}
+
+function verifyLogin(){
+  var u=$('login_user').value.trim(), p=$('login_pass').value.trim();
+  if(!u||!p){alert('Enter both username and password.');return;}
+  if(u==='admin' && p===(D.users.admin?D.users.admin.pass:'admin123')){
+    CURRENT_USER={username:'admin',role:'admin',staffId:D.users.admin.staffId||'',tabs:ALL_TAB_KEYS.slice()};
+  }else if(D.users[u] && D.users[u].pass===p){
+    CURRENT_USER={
+      username:u,
+      role:D.users[u].role,
+      staffId:D.users[u].staffId||'',
+      tabs:D.users[u].tabs||['hm']
+    };
+  }else{
+    alert('Invalid Username or Password.');
+    return;
+  }
+  sessionStorage.setItem('school_user_v8',JSON.stringify(CURRENT_USER));
+  checkAuth();
+}
+
+function logout(){
+  sessionStorage.removeItem('school_user_v8');
+  CURRENT_USER=null;
+  clearTimeout(idleTimer);
+  $('auth_box').style.display='flex';
+}
+
+var $=function(i){return document.getElementById(i)},
+esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})},
+pad=function(n,l){return String(n).padStart(l,'0')},
+fd=function(d){return d?d.split('-').reverse().join('/'):''},
+n0=function(x){return+x||0},
+CL=['Nursery','L.K.G','U.K.G','Class - I','Class - II','Class - III','Class - IV','Class - V','Class - VI','Class - VII','Class - VIII','Class - IX','Class - X','Class - XI','Class - XII'];
+var ROMAN=['Nursery','L.K.G','U.K.G','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+
+function nextSesStr(s){
+  var y=+String(s||D.set.ses).slice(0,4);
+  return (y+1)+'-'+pad((y+2)%100,2);
+}
+
+function getSubj(cls, lang){
+  if(cls===0 || cls===1 || cls===2) return ['English', lang||'Bengali', 'Mathematics', 'General Knowledge'];
+  if(cls>=3 && cls<=6) return ['English', '2nd Language - '+(lang||'Bengali'), 'Mathematics', 'Environmental Studies (EVS)', 'General Knowledge', 'Science'];
+  return ['English', 'Hindi', 'Bengali', 'Mathematics', 'Social Studies', 'G.K.', 'Science'];
+}
+function getCoSubj(cls, lang){
+  if(cls<=2) return ['General Knowledge', 'English Recitation', (lang||'Bengali')+' Recitation', 'Art and Craft', 'Health and P.T', 'Dance and Music', 'Discipline'];
+  return ['Computer', 'Art & Craft', 'Health & Physical Education', 'Discipline', 'Dance & Music'];
+}
+
+function key(s,id){return s+'|'+id}
+function stu(id){return D.st.find(function(s){return s.id==id})||{}}
+function emp(id){return D.em.find(function(e){return e.id==id})||{}}
+function gr(p){return p>=90?'A1':p>=80?'A2':p>=70?'B1':p>=60?'B2':p>=50?'C1':p>=40?'C2':p>=33?'D':'E'}
+function admno(e){return 'ADM-'+String(e.s||D.set.ses).slice(0,4)+'-'+pad(e.cls,2)+'-'+(e.sec||'')+pad(e.roll||0,3)}
+function fmtNum(v){return v%1?Number(v.toFixed(2)):v}
+
+function getAutoRemarks(p){
+  if(p>=90) return "A1 (90% \u2013 100%): Outstanding academic performance; demonstrates exceptional dedication, focus, and mastery across all subjects.";
+  if(p>=80) return "A2 (80% \u2013 89%): Commendable effort and strong understanding; consistently produces high-quality work and shows great potential.";
+  if(p>=70) return "B1 (70% \u2013 79%): Good progress overall; maintains steady effort and can achieve top grades with slightly more consistency.";
+  if(p>=60) return "B2 (60% \u2013 69%): Satisfactory performance; shows a fair grasp of concepts and will benefit from more regular revision and focus.";
+  if(p>=50) return "C1 (50% \u2013 59%): Average performance; needs to put in more consistent effort and practice to strengthen core concepts.";
+  if(p>=40) return "C2 (40% \u2013 49%): Below-average results; requires dedicated study habits, better time management, and extra attention in class.";
+  if(p>=33) return "D (33% \u2013 39%): Needs significant improvement; must focus on foundational concepts and seek regular guidance to avoid falling behind.";
+  return "E (Below 33% / Needs Improvement): Unsatisfactory performance; requires immediate academic intervention, extra support, and consistent daily practice.";
+}
+
+function calcTerm1(e){
+  var m=D.mk[key(e.s,e.id)];if(!m)return null;var tot=0,S=getSubj(e.cls, e.lang);
+  var rows=S.map(function(s){
+    var a=m[s]||[];
+    var pt1=n0(a[0]), sea1=n0(a[1]), ut1=n0(a[2]), hy=n0(a[5]);
+    var t1_pt=pt1, t1_sea=sea1, t1_ut=ut1/4;
+    var t1=t1_pt+t1_ut+t1_sea+hy;
+    tot+=t1;
+    return{t1_pt:t1_pt,t1_ut:t1_ut,t1_sea:t1_sea,hy:hy,t1:t1,gr:gr(t1)};
+  });
+  var p=S.length?tot/(S.length*50)*100:0;
+  return{rows:rows,tot:tot,p:p,gr:gr(p),pass:rows.every(function(r){return r.t1>=16.5})}
+}
+
+function calc(e){
+  var m=D.mk[key(e.s,e.id)];if(!m)return null;var tot=0,S=getSubj(e.cls, e.lang);
+  var rows=S.map(function(s){
+    var a=m[s]||[];
+    var pt1=n0(a[0]), sea1=n0(a[1]), ut1=n0(a[2]), pt2=n0(a[3]), sea2=n0(a[4]), hy=n0(a[5]);
+    var pt3=n0(a[6]), sea3=n0(a[7]), ut2=n0(a[8]), pt4=n0(a[9]), sea4=n0(a[10]), ann=n0(a[11]);
+    var t1_pt=(pt1+pt2)/2, t1_sea=(sea1+sea2)/2, t1_ut=ut1/4;
+    var t1=t1_pt+t1_ut+t1_sea+hy;
+    var t2_pt=(pt3+pt4)/2, t2_sea=(sea3+sea4)/2, t2_ut=ut2/4;
+    var t2=t2_pt+t2_ut+t2_sea+ann;
+    var g=(t1+t2)/2; tot+=g;
+    return{t1_pt:t1_pt,t1_ut:t1_ut,t1_sea:t1_sea,hy:hy,t1:t1,t2_pt:t2_pt,t2_ut:t2_ut,t2_sea:t2_sea,ann:ann,t2:t2,g:g,gr:gr(g)};
+  });
+  var p=S.length?tot/(S.length*100)*100:0;
+  return{rows:rows,tot:tot,p:p,gr:gr(p),pass:rows.every(function(r){return r.g>=33})}
+}
+
+function peers(e){return D.en.filter(function(x){return x.s==e.s&&x.cls==e.cls})}
+function rank(e){var c=calc(e);return c?peers(e).filter(function(x){var y=calc(x);return y&&y.tot>c.tot}).length+1:''}
+function high(e,i){return Math.max.apply(0,[0].concat(peers(e).map(function(x){var y=calc(x);return y?y.rows[i].g:0})))}
+function highTerm1(e,i){return Math.max.apply(0,[0].concat(peers(e).map(function(x){var y=calcTerm1(x);return y?y.rows[i].t1:0})))}
+
+function setPrintMode(mode){
+  var ps=$('page_style');
+  if(!ps)return;
+  if(mode==='A5'){
+    ps.textContent='@page{size:A5 landscape;margin:6mm}';
+  }else{
+    ps.textContent='@page{size:A4 portrait;margin:6mm}';
+  }
+}
+
+function getAllowedTabs(){
+  if(!CURRENT_USER) return [];
+  if(CURRENT_USER.role==='admin') return ALL_TAB_DEFS;
+  var allowed=CURRENT_USER.tabs||['hm'];
+  return ALL_TAB_DEFS.filter(function(t){return allowed.indexOf(t[0])>-1});
+}
+
+function renderTabs(){
+  var tabs=getAllowedTabs();
+  $('tabs').innerHTML=tabs.map(function(t){
+    return '<button data-t="'+t[0]+'" onclick="go(\''+t[0]+'\')">'+esc(t[1])+'</button>';
+  }).join('');
+}
+
+function go(t){
+  var tabs=getAllowedTabs();
+  if(!tabs.length){$('v').innerHTML='<div class="box">No tabs assigned to your account. Contact Administrator.</div>';return;}
+  if(!tabs.some(function(x){return x[0]===t})) t=tabs[0][0];
+  T=t;
+  setPrintMode(t==='ad'?'A5':'A4');
+  document.querySelectorAll('.tabs button').forEach(function(b){b.className=b.dataset.t==t?'on':''});
+  var views={
+    hm:homeView,
+    st:function(){crud('st')},
+    en:enrollmentView,
+    em:function(){crud('em')},
+    mk:marks,
+    ms:msv,
+    ms1:ms1View,
+    ad:adv,
+    us:userView,
+    se:sett
+  };
+  if(views[t]) views[t](); else homeView();
+}
+
+function buildGaugeSVG(pct, color){
+  var r=28, c=2*Math.PI*r;
+  var clamped=Math.max(0,Math.min(100,pct||0));
+  var offset=c-(clamped/100)*c;
+  return '<svg class="gauge-svg" viewBox="0 0 68 68">'+
+    '<circle class="gauge-bg" cx="34" cy="34" r="'+r+'"></circle>'+
+    '<circle class="gauge-fill" cx="34" cy="34" r="'+r+'" style="--gcol:'+color+';stroke-dasharray:'+c.toFixed(1)+';stroke-dashoffset:'+offset.toFixed(1)+'"></circle>'+
+  '</svg>';
+}
+
+function homeView(){
+  ensureDefaults();
+  var curSes=D.set.ses;
+  var nextSes=nextSesStr(curSes);
+  var totalStudents=D.st.length;
+  var totalStaff=D.em.length;
+  var activeEnrolledList=D.en.filter(function(e){return e.s==curSes});
+  var activeEnrolled=activeEnrolledList.length;
+
+  var gradedCount=activeEnrolledList.filter(function(e){
+    var m=D.mk[key(e.s,e.id)];
+    return m && Object.keys(m).length>0;
+  }).length;
+  var marksPct=activeEnrolled ? Math.round((gradedCount/activeEnrolled)*100) : 0;
+  var enrollPct=totalStudents ? Math.round((activeEnrolled/totalStudents)*100) : 0;
+  var boysCount=D.st.filter(function(s){return s.gender==='Male'}).length;
+  var girlsCount=D.st.filter(function(s){return s.gender==='Female'}).length;
+
+  var staffObj = (CURRENT_USER && CURRENT_USER.staffId) ? emp(CURRENT_USER.staffId) : {};
+  var displayUser = staffObj.name || (CURRENT_USER ? CURRENT_USER.username : 'Administrator');
+  var displayDes = staffObj.des || (CURRENT_USER && CURRENT_USER.role==='admin' ? 'System Administrator' : 'Faculty Member');
+  var displayPhoto = staffObj.photo || DEFAULT_AVATAR;
+  var displaySubj = staffObj.subj ? ('Subjects: '+staffObj.subj) : ('Access Level: '+(CURRENT_USER?CURRENT_USER.role.toUpperCase():'ADMIN'));
+
+  var classCounts=CL.map(function(cName, idx){
+    return {
+      name:cName,
+      short:ROMAN[idx],
+      count:activeEnrolledList.filter(function(e){return e.cls==idx}).length
+    };
+  });
+  var maxClassCount=Math.max.apply(0,[1].concat(classCounts.map(function(x){return x.count})));
+
+  var barChartHTML=classCounts.map(function(item){
+    var hPct=Math.max(4, Math.round((item.count/maxClassCount)*115));
+    return '<div class="bar-col" title="'+esc(item.name)+': '+item.count+' Students">'+
+      '<div class="bar-num">'+item.count+'</div>'+
+      '<div class="bar-fill" style="height:'+hPct+'px"></div>'+
+      '<div class="bar-lbl">'+esc(item.short)+'</div>'+
+    '</div>';
+  }).join('');
+
+  var classGridHTML=classCounts.map(function(item){
+    return '<div style="background:rgba(255,255,255,0.04);padding:11px 13px;border-radius:12px;border:1px solid var(--b);display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-weight:600;font-size:12.5px">'+esc(item.name)+'</span>'+
+      '<span style="font-family:var(--font-head);font-size:16px;font-weight:800;color:var(--a2)">'+item.count+'</span>'+
+    '</div>';
+  }).join('');
+
+  var auditKeys=Object.keys(D.mk_audit||{}).slice(-5).reverse();
+  var activityHTML=auditKeys.length ? auditKeys.map(function(kStr){
+    var parts=kStr.split('|'), a=D.mk_audit[kStr], sObj=stu(parts[1]);
+    return '<div style="padding:8px 10px;border-bottom:1px solid var(--b);font-size:12px;display:flex;justify-content:space-between;gap:8px">'+
+      '<span><b>'+esc(sObj.name||parts[1])+'</b> ('+esc(parts[0])+')</span>'+
+      '<span style="color:var(--m)">by <b>'+esc(a.user)+'</b> &bull; '+esc(a.time)+'</span>'+
+    '</div>';
+  }).join('') : '<div style="color:var(--m);font-size:12.5px;padding:10px 0">No recent marks entry logs recorded yet.</div>';
+
+  $('v').innerHTML=
+    '<div class="dash-hero">'+
+      '<div class="user-glass-card">'+
+        '<div class="user-avatar-ring"><img src="'+esc(displayPhoto)+'" alt="User"></div>'+
+        '<div style="flex:1">'+
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">'+
+            '<span class="badge-pill">'+esc(displayDes)+'</span>'+
+            '<span style="font-size:11px;color:var(--m)">ID: '+esc(CURRENT_USER.staffId||CURRENT_USER.username)+'</span>'+
+          '</div>'+
+          '<h2 style="margin:0;font-family:var(--font-head);font-size:21px;font-weight:800">Welcome, '+esc(displayUser)+'</h2>'+
+          '<div style="font-size:12.5px;color:var(--m);margin-top:3px">'+esc(displaySubj)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="box" style="margin-bottom:0;background:var(--grad);color:#fff;display:flex;flex-direction:column;justify-content:space-between">'+
+        '<div>'+
+          '<div style="font-size:11.5px;text-transform:uppercase;letter-spacing:0.8px;opacity:0.88;font-weight:700">Academic Session Control</div>'+
+          '<h2 style="margin:4px 0;font-family:var(--font-head);font-size:24px;font-weight:800">Session '+esc(curSes)+'</h2>'+
+          '<div style="font-size:12px;opacity:0.9">Upcoming Session: <b>'+esc(nextSes)+'</b> &bull; Exam: '+esc(D.set.exam)+'</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-top:12px">'+
+          '<span style="font-size:12px;font-weight:600">Switch Session:</span>'+
+          '<select id="quick_ses_sel" style="width:auto;background:#fff;color:#0f172a;font-weight:700;padding:6px 10px" onchange="changeActiveSession(this.value)">'+getSessionOptionsHTML(curSes)+'</select>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="kpi-grid">'+
+      '<div class="kpi-card" style="--accent:#6366f1">'+
+        '<div class="gauge-box">'+
+          buildGaugeSVG(enrollPct,'#6366f1')+
+          '<div><div class="kpi-title">Enrolled ('+esc(curSes)+')</div><div class="kpi-val">'+activeEnrolled+' <span style="font-size:13px;color:var(--m)">/ '+totalStudents+'</span></div><div class="kpi-sub">'+enrollPct+'% of Master Registry</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="kpi-card" style="--accent:#06b6d4">'+
+        '<div class="gauge-box">'+
+          buildGaugeSVG(marksPct,'#06b6d4')+
+          '<div><div class="kpi-title">Marks Progress</div><div class="kpi-val">'+marksPct+'%</div><div class="kpi-sub">'+gradedCount+' of '+activeEnrolled+' Evaluated</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="kpi-card" style="--accent:#10b981">'+
+        '<div class="kpi-top"><span class="kpi-title">Total Faculty &amp; Staff</span></div>'+
+        '<div class="kpi-val" style="color:#10b981">'+totalStaff+'</div>'+
+        '<div class="kpi-sub">Active School Personnel</div>'+
+      '</div>'+
+      '<div class="kpi-card" style="--accent:#f59e0b">'+
+        '<div class="kpi-top"><span class="kpi-title">Student Gender Split</span></div>'+
+        '<div class="kpi-val" style="color:#f59e0b">'+boysCount+'B / '+girlsCount+'G</div>'+
+        '<div class="kpi-sub">Total Registered: '+totalStudents+'</div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="dash-hero">'+
+      '<div class="box" style="margin-bottom:0">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+          '<h3 style="margin:0;font-family:var(--font-head);font-size:16px">'+ICONS.chart+' Class-Wise Strength Distribution ('+esc(curSes)+')</h3>'+
+          '<span class="badge-pill">Live Telemetry</span>'+
+        '</div>'+
+        '<div class="bar-chart">'+barChartHTML+'</div>'+
+      '</div>'+
+      '<div class="box" style="margin-bottom:0">'+
+        '<h3 style="margin:0 0 8px 0;font-family:var(--font-head);font-size:16px">'+ICONS.shield+' Recent Marks &amp; Audit Activity</h3>'+
+        activityHTML+
+      '</div>'+
+    '</div>'+
+
+    '<div class="box" style="margin-top:14px">'+
+      '<h3 style="margin:0 0 10px 0;font-family:var(--font-head);font-size:15px">Class-wise Roster Breakdown ('+esc(curSes)+')</h3>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px">'+classGridHTML+'</div>'+
+    '</div>';
+}
+
+function changeActiveSession(val){
+  D.set.ses=val;
+  M.s=val;
+  save(['set']);
+  go('hm');
+}
+
+function getStaffDesignations(){
+  ensureDefaults();
+  return D.roles;
+}
+
+var CFG={
+  st:{
+    f:[
+      ['id','Student ID','t'],['name','Student Name','t'],['dob','Date of Birth','date'],
+      ['gender','Gender',['Male','Female','Other']],['able','Especially Able',['No','Yes']],
+      ['udise','UDISE Code','t'],['aadhaar','Student Aadhaar No.','t'],
+      ['father','Father\u2019s Name','t'],['faadhaar','Father\u2019s Aadhaar No.','t'],
+      ['mother','Mother\u2019s Name','t'],['maadhaar','Mother\u2019s Aadhaar No.','t'],
+      ['phone','Primary Phone','tel'],['phone2','Alternative Phone 1','tel'],['phone3','Alternative Phone 2','tel'],
+      ['wa','WhatsApp No.','tel'],['email','Email ID','email'],['addr','Address','t'],
+      ['adm','Admission Session','sess_drop'],['photo','Student Photo','img']
+    ],
+    x:function(){return[]}
+  },
+  em:{
+    f:[
+      ['id','Employee ID','t'],['name','Full Name','t'],['des','Designation','role_sel'],
+      ['aadhaar','Aadhaar No.','t'],['deg','Highest Degree',['Ph.D','Master\'s','Bachelor\'s','Higher Secondary']],
+      ['prof','Professional Degree',['B.Ed','D.El.Ed','None']],['subj','Subject(s) Taught','t'],
+      ['phone','Phone','tel'],['phone2','Alternative Phone','tel'],['wa','WhatsApp No.','tel'],
+      ['email','Email ID','email'],['join','Joining Date','date'],['addr','Address','t'],['photo','Staff Photo','img']
+    ],
+    x:function(){return[]}
+  }
+};
+
+function handleImgUpload(inpEl, targetId){
+  var f=inpEl.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var cv=document.createElement('canvas');
+      var max=220, w=img.width, h=img.height;
+      if(w>h){if(w>max){h*=max/w;w=max}}else{if(h>max){w*=max/h;h=max}}
+      cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      $(targetId).value=cv.toDataURL('image/jpeg',0.78);
+    };
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(f);
+}
+
+function getSessionOptionsHTML(selectedVal){
+  ensureDefaults();
+  var cur = D.set.ses || '2026-27';
+  var nxt = nextSesStr(cur);
+  var list = D.sessions.slice();
+  if(list.indexOf(cur)===-1) list.push(cur);
+  if(list.indexOf(nxt)===-1) list.push(nxt);
+  var sel = selectedVal || cur;
+  return list.map(function(s){
+    var tag = (s===cur) ? ' (Current)' : (s===nxt ? ' (Next)' : '');
+    return '<option value="'+esc(s)+'"'+(s===sel?' selected':'')+'>'+esc(s)+tag+'</option>';
+  }).join('');
+}
+
+function inp(id,t){
+  if(Array.isArray(t))return'<select id="'+id+'">'+t.map(function(o){return'<option>'+esc(o)+'</option>'}).join('')+'</select>';
+  if(t=='role_sel')return'<select id="'+id+'">'+getStaffDesignations().map(function(o){return'<option>'+esc(o)+'</option>'}).join('')+'</select>';
+  if(t=='cls_sel')return'<select id="'+id+'" onchange="checkLangLock()"><option value="">--Select Class--</option>'+CL.map(function(c,i){return'<option value="'+i+'">'+esc(c)+'</option>'}).join('')+'</select>';
+  if(t=='sess_drop')return'<select id="'+id+'">'+getSessionOptionsHTML(D.set.ses)+'</select>';
+  if(t=='img')return'<div style="display:flex;gap:4px"><input id="'+id+'" type="text" placeholder="URL or upload"><label class="mb" style="padding:7px;cursor:pointer;white-space:nowrap">'+ICONS.cam+' Photo<input type="file" accept="image/*" capture="environment" style="display:none" onchange="handleImgUpload(this,\''+id+'\')"></label></div>';
+  return'<input id="'+id+'" type="'+(t=='t'||t=='tel'||t=='email'||t=='date'?t:'text')+'">';
+}
+
+function checkLangLock(){
+  var clsEl=$('f_cls'), langEl=$('f_lang');
+  if(!clsEl||!langEl) return;
+  var clsVal=+clsEl.value;
+  if(clsVal>=7){
+    langEl.value='Bengali';
+    langEl.disabled=true;
+    langEl.title="Both Hindi & Bengali are compulsory for Class V and above.";
+  } else {
+    langEl.disabled=false;
+    langEl.title="";
+  }
+}
+
+function generateStudentID(admSes){
+  var yy=String(admSes||D.set.ses).replace('-','').slice(2,6);
+  var count=D.st.length+1;
+  while(D.st.some(function(s){return s.id==='ST'+yy+pad(count,4)})) count++;
+  return 'ST'+yy+pad(count,4);
+}
+
+function crud(k){
+  ensureDefaults();
+  var c=CFG[k];ED=null;
+  var title = k==='st' ? 'Student Master Directory' : 'Staff & Faculty Directory';
+  $('v').innerHTML=
+    '<div class="box no"><h3 style="margin-top:0;font-family:var(--font-head)">'+title+'</h3>'+
+    '<div class="g">'+c.f.map(function(f){return'<div><label>'+esc(f[1])+'</label>'+inp('f_'+f[0],f[2])+'</div>'}).join('')+'</div>'+
+    '<button class="btn" id="sb" onclick="sv(\''+k+'\')">+ Save Record</button><button class="btn g2" onclick="crud(\''+k+'\')">Clear</button></div>'+
+    '<div class="box no"><button class="btn g2" onclick="csvExport(\''+k+'\')">Export CSV</button> <label class="btn g2" style="display:inline-block;cursor:pointer">Import CSV<input type="file" accept=".csv" style="display:none" onchange="csvImport(event,\''+k+'\')"></label></div>'+
+    '<div class="box"><input id="q" placeholder="'+ICONS.search+' Search name, phone, ID, UDISE..." oninput="tbl(\''+k+'\')"><p style="color:var(--m);font-size:12px" id="cn"></p><div class="sc" id="tb"></div></div>';
+
+  var d=function(n,v){if($('f_'+n)&&!$('f_'+n).value)$('f_'+n).value=v};
+  if(k=='st'){d('id',generateStudentID(D.set.ses));d('adm',D.set.ses)}
+  if(k=='em')d('id','E'+pad(D.em.length+1,3));
+  tbl(k);
+}
+
+function sv(k){
+  var c=CFG[k],o={};
+  c.f.forEach(function(f){o[f[0]]=$('f_'+f[0])?$('f_'+f[0]).value.trim():''});
+  if(!o.name){alert('Name is required');return}
+  if(D[k].some(function(x,i){return x.id==o.id&&i!=ED})){alert('ID already exists');return}
+  if(ED!=null)D[k][ED]=o;else D[k].push(o);
+  save([k]);crud(k);
+}
+
+function editRow(k,i){
+  var r=D[k][i];
+  CFG[k].f.forEach(function(f){
+    var el=$('f_'+f[0]);
+    if(el) el.value = r[f[0]]==null ? (f[2]=='sess_drop'?D.set.ses:'') : r[f[0]];
+  });
+  ED=i;$('sb').textContent='Update Record';scrollTo(0,0);
+}
+function delRow(k,i){if(confirm('Delete this record permanently?')){D[k].splice(i,1);save([k]);tbl(k)}}
+
+function tbl(k){
+  var c=CFG[k],q=($('q').value||'').toLowerCase();
+  var rows=D[k].map(function(r,i){return[r,i,c.x(r)]}).filter(function(a){return!q||(Object.values(a[0]).join(' ')+' '+a[2].join(' ')).toLowerCase().indexOf(q)>-1});
+  $('cn').textContent=rows.length+' record(s) found';
+  $('tb').innerHTML='<table><tr>'+c.f.map(function(f){return'<th>'+esc(f[1])+'</th>'}).join('')+'<th>Actions</th></tr>'+rows.map(function(a){var r=a[0];
+  return'<tr>'+c.f.map(function(f){
+    if(f[0]=='photo') return '<td>'+(r[f[0]]?'<img src="'+esc(r[f[0]])+'" class="avatar">':'No photo')+'</td>';
+    return'<td>'+esc(f[2]=='date'?fd(r[f[0]]):r[f[0]])+'</td>'}).join('')+'<td><button class="mb" onclick="editRow(\''+k+'\','+a[1]+')">Edit</button> <button class="mb d" onclick="delRow(\''+k+'\','+a[1]+')">Del</button></td></tr>'}).join('')+'</table>';
+}
+
+/* ============================================================================
+   UNIFIED ENROLLMENT (CURRENT & FUTURE SESSIONS + UDISE & PARENT AADHAAR)
+   ============================================================================ */
+function enrollmentView(){
+  ensureDefaults();
+  ED=null;
+  var allRecordedStudents = D.st.slice().reverse();
+
+  var studentOpts = '<option value="">-- 1st Select Recorded Student --</option>' + allRecordedStudents.map(function(s){
+    var prev=D.en.filter(function(e){return e.id===s.id});
+    var last=prev.length ? prev[prev.length-1] : null;
+    var hint=last ? (' [Last: '+CL[last.cls]+' ('+last.s+')]') : (' [New | Father: '+(s.father||'N/A')+']');
+    return '<option value="'+esc(s.id)+'">'+esc(s.id)+' \u2013 '+esc(s.name)+esc(hint)+'</option>';
+  }).join('');
+
+  $('v').innerHTML=
+    '<div class="box no">'+
+      '<h3 style="margin-top:0;font-family:var(--font-head);color:var(--a2)">Student Enrollment (Current &amp; Future Sessions)</h3>'+
+      '<p style="color:var(--m);font-size:12.5px;margin-top:-6px;margin-bottom:14px">Select a student registered in the <b>Students</b> tab to enroll them in the current session or promote/enroll them into any future session.</p>'+
+      '<div class="g">'+
+        '<div><label>1. Select Student (from Students Tab) *</label><select id="en_id" onchange="onSelectStudentForEnroll(this.value)">'+studentOpts+'</select></div>'+
+        '<div><label>2. Enrollment Session (Current / Future) *</label><select id="en_s">'+getSessionOptionsHTML(D.set.ses)+'</select></div>'+
+        '<div><label>3. Class *</label><select id="f_cls" onchange="checkLangLock()"><option value="">--Select Class--</option>'+CL.map(function(c,i){return'<option value="'+i+'">'+esc(c)+'</option>'}).join('')+'</select></div>'+
+        '<div><label>4. Section</label><input id="en_sec" placeholder="e.g. A"></div>'+
+        '<div><label>5. Roll No.</label><input id="en_roll" type="number"></div>'+
+        '<div><label>6. 2nd Language (Nur\u2013IV)</label><select id="f_lang"><option>Bengali</option><option>Hindi</option></select></div>'+
+        '<div><label>7. UDISE Code</label><input id="en_udise" placeholder="Enter Student UDISE Code"></div>'+
+        '<div><label>8. Father\u2019s Aadhaar Card No.</label><input id="en_faadhaar" placeholder="12-digit Father Aadhaar"></div>'+
+        '<div><label>9. Mother\u2019s Aadhaar Card No.</label><input id="en_maadhaar" placeholder="12-digit Mother Aadhaar"></div>'+
+        '<div><label>10. Take Tuition?</label><select id="en_tuition"><option>No</option><option>Yes</option></select></div>'+
+      '</div>'+
+      '<div id="en_preview_box"></div>'+
+      '<button class="btn" id="en_btn" onclick="saveEnrollment()">+ Save Enrollment</button>'+
+      '<button class="btn g2" onclick="enrollmentView()">Reset</button>'+
+      '<button class="btn g2" onclick="csvExport(\'en\')">Export Enrollment CSV</button>'+
+      (allRecordedStudents.length===0 ? '<p style="color:#f59e0b;font-size:12.5px;margin-top:10px">No students found in the Students tab yet. Please register student data in the <b>Students</b> tab first.</p>' : '')+
+    '</div>'+
+    '<div class="box"><h4 style="margin-top:0;font-family:var(--font-head)">All Session Enrollments Registry</h4>'+
+      '<input id="q_en" placeholder="'+ICONS.search+' Search by student name, ID, UDISE, session, class..." oninput="renderEnrollTable()" style="margin-bottom:10px">'+
+      '<div class="sc" id="en_tbl"></div>'+
+    '</div>';
+  renderEnrollTable();
+}
+
+function onSelectStudentForEnroll(stId){
+  var box=$('en_preview_box');
+  if(!stId){if(box)box.innerHTML='';return;}
+  var s=stu(stId);
+  if(!s.id){if(box)box.innerHTML='';return;}
+
+  var prev=D.en.filter(function(e){return e.id===stId});
+  var last=prev.length ? prev[prev.length-1] : null;
+
+  $('en_udise').value = (last && last.udise) || s.udise || '';
+  $('en_faadhaar').value = (last && last.faadhaar) || s.faadhaar || '';
+  $('en_maadhaar').value = (last && last.maadhaar) || s.maadhaar || '';
+
+  if(last && ED===null){
+    var nextCls=Math.min(CL.length-1, (+last.cls)+1);
+    $('f_cls').value=String(nextCls);
+    $('en_sec').value=last.sec||'';
+    $('f_lang').value=last.lang||'Bengali';
+    $('en_tuition').value=last.tuition||'No';
+    $('en_s').value=nextSesStr(last.s);
+    checkLangLock();
+  }else if(s.adm && ED===null){
+    $('en_s').value=s.adm;
+  }
+
+  if(box){
+    box.innerHTML='<div class="stu-preview">'+
+      (s.photo ? '<img src="'+esc(s.photo)+'" class="avatar">' : '')+
+      '<div style="font-size:12.5px;line-height:1.5">'+
+        '<b style="font-size:14px;color:var(--a2)">'+esc(s.name)+'</b> ('+esc(s.id)+')'+(last ? ' <span class="badge-pill">Previously in '+esc(CL[last.cls])+' ('+esc(last.s)+')</span>' : ' <span class="badge-pill">First-Time Enrollment</span>')+'<br>'+
+        '<b>Father:</b> '+esc(s.father||'-')+' &nbsp;|&nbsp; <b>Mother:</b> '+esc(s.mother||'-')+' &nbsp;|&nbsp; <b>DOB:</b> '+esc(fd(s.dob)||'-')+' &nbsp;|&nbsp; <b>Phone:</b> '+esc(s.phone||'-')+
+      '</div>'+
+    '</div>';
+  }
+}
+
+function saveEnrollment(){
+  var id=$('en_id').value.trim();
+  var s=$('en_s').value || D.set.ses;
+  var clsVal=$('f_cls').value;
+  if(!id){alert('Please select a recorded student from the Students tab first.');return;}
+  var stRec=D.st.find(function(x){return x.id===id});
+  if(!stRec){alert('Student record not found in Students tab. Add student data in Students tab first.');return;}
+  if(clsVal===''){alert('Please select the Class.');return;}
+  if(D.en.some(function(x,i){return x.s===s && x.id===id && i!==ED})){
+    alert('This student is already enrolled in session '+s+'.');
+    return;
+  }
+
+  var udise=$('en_udise').value.trim();
+  var faadhaar=$('en_faadhaar').value.trim();
+  var maadhaar=$('en_maadhaar').value.trim();
+
+  if(udise) stRec.udise=udise;
+  if(faadhaar) stRec.faadhaar=faadhaar;
+  if(maadhaar) stRec.maadhaar=maadhaar;
+
+  var enObj={
+    s:s, id:id, cls:+clsVal, sec:$('en_sec').value.trim(),
+    roll:+$('en_roll').value||'', lang:$('f_lang').value,
+    udise:udise, faadhaar:faadhaar, maadhaar:maadhaar,
+    tuition:$('en_tuition').value
+  };
+  if(ED!==null) D.en[ED]=enObj; else D.en.push(enObj);
+  save(['en','st']);
+  alert('Enrollment saved for '+stRec.name+' ('+id+') in session '+s+' ' + ICONS.check);
+  enrollmentView();
+}
+
+function editEnrollRow(idx){
+  var r=D.en[idx];
+  if(!r)return;
+  ED=idx;
+  $('en_id').value=r.id;
+  onSelectStudentForEnroll(r.id);
+  $('en_s').value=r.s;
+  $('f_cls').value=String(r.cls);
+  $('en_sec').value=r.sec||'';
+  $('en_roll').value=r.roll||'';
+  $('f_lang').value=r.lang||'Bengali';
+  $('en_udise').value=r.udise||stu(r.id).udise||'';
+  $('en_faadhaar').value=r.faadhaar||stu(r.id).faadhaar||'';
+  $('en_maadhaar').value=r.maadhaar||stu(r.id).maadhaar||'';
+  $('en_tuition').value=r.tuition||'No';
+  checkLangLock();
+  $('en_btn').textContent='Update Enrollment';
+  scrollTo(0,0);
+}
+
+function delEnrollRow(idx){
+  if(confirm('Remove this enrollment record?')){
+    D.en.splice(idx,1);
+    save(['en']);
+    renderEnrollTable();
+  }
+}
+
+function renderEnrollTable(){
+  var el=$('en_tbl'); if(!el)return;
+  var q=($('q_en')?$('q_en').value:'').toLowerCase();
+  var list=D.en.map(function(r,i){return {r:r,i:i,name:stu(r.id).name||''}}).filter(function(item){
+    if(!q) return true;
+    var r=item.r;
+    return (r.id+' '+item.name+' '+r.s+' '+CL[r.cls]+' '+(r.udise||'')+' '+(r.faadhaar||'')+' '+(r.maadhaar||'')).toLowerCase().indexOf(q)>-1;
+  }).sort(function(a,b){
+    return String(b.r.s||'').localeCompare(String(a.r.s||'')) || a.r.cls-b.r.cls || a.r.roll-b.r.roll;
+  });
+
+  el.innerHTML='<table><tr><th>Session</th><th>Student ID</th><th>Student Name</th><th>Class</th><th>Sec</th><th>Roll</th><th>UDISE Code</th><th>Father\u2019s Aadhaar</th><th>Mother\u2019s Aadhaar</th><th>2nd Lang</th><th>Admit No.</th><th>Actions</th></tr>'+
+    list.map(function(x){
+      var r=x.r, sObj=stu(r.id);
+      return '<tr><td><b>'+esc(r.s)+'</b></td><td>'+esc(r.id)+'</td><td>'+esc(x.name)+'</td><td>'+esc(CL[r.cls])+'</td><td>'+esc(r.sec)+'</td><td>'+esc(r.roll)+'</td>'+
+        '<td>'+esc(r.udise||sObj.udise||'')+'</td><td>'+esc(r.faadhaar||sObj.faadhaar||'')+'</td><td>'+esc(r.maadhaar||sObj.maadhaar||'')+'</td>'+
+        '<td>'+esc(r.lang)+'</td><td>'+esc(admno(r))+'</td>'+
+        '<td><button class="mb" onclick="editEnrollRow('+x.i+')">Edit</button> <button class="mb d" onclick="delEnrollRow('+x.i+')">Del</button></td></tr>';
+    }).join('')+'</table>';
+}
+
+/* ============================================================================
+   MARKS ENTRY WITH CELL-LEVEL LOCKING SYSTEM
+   ============================================================================ */
+function pick(all){
+  ensureDefaults();
+  M.s=M.s||D.set.ses;
+  var L=D.en.filter(function(e){return (e.s||D.set.ses)==M.s&&e.cls==M.c}).sort(function(a,b){return a.roll-b.roll});
+  if(!L.some(function(e){return e.id==M.id}))M.id=all?'':(L[0]?L[0].id:'');
+  return'<div class="g"><div><label>Session</label><select onchange="M.s=this.value;M.id=\'\';go(T)">'+getSessionOptionsHTML(M.s)+'</select></div><div><label>Class</label><select onchange="M.c=+this.value;M.id=\'\';go(T)">'+CL.map(function(c,i){return'<option value="'+i+'"'+(i==M.c?' selected':'')+'>'+esc(c)+'</option>'}).join('')+'</select></div><div><label>Student</label><select onchange="M.id=this.value;go(T)">'+(all?'<option value="">\u2014 All in class \u2014</option>':'')+L.map(function(e){return'<option value="'+esc(e.id)+'"'+(e.id==M.id?' selected':'')+'>'+(e.roll||'-')+'. '+esc(stu(e.id).name)+'</option>'}).join('')+'</select></div></div>';
+}
+function curE(){return D.en.find(function(x){return (x.s||D.set.ses)==M.s&&x.cls==M.c&&x.id==M.id})}
+function listE(){return M.id?[curE()]:D.en.filter(function(e){return (e.s||D.set.ses)==M.s&&e.cls==M.c}).sort(function(a,b){return a.roll-b.roll})}
+
+function marks(){
+  var h='<div class="box">'+pick(0)+'</div>',e=curE();
+  if(!e){
+    $('v').innerHTML=h+'<div class="box"><p style="color:var(--m);margin:0">No student enrolled in session '+esc(M.s)+' for '+esc(CL[M.c])+'. Please enroll students in the <b>Enrollment</b> tab first.</p></div>';
+    return;
+  }
+  var kStr=key(e.s,e.id);
+  var m=D.mk[kStr]||{}, cg=D.co[kStr]||[], S=getSubj(e.cls, e.lang);
+  var audit=D.mk_audit[kStr] || {};
+  var cellLocks=audit.cells || {};
+  var isAdmin = CURRENT_USER && CURRENT_USER.role==='admin';
+
+  h+='<div class="box sc"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">'+
+    '<div><b style="font-size:15px">'+esc(stu(e.id).name)+'</b> &bull; '+esc(CL[e.cls])+' &bull; Roll '+(e.roll||'-')+'</div>'+
+    '<div style="font-size:11.5px;color:var(--m)">'+ICONS.lock+' Filled cells lock automatically on Save. Empty cells remain open.</div>'+
+  '</div>';
+  if(audit.user){
+    h+='<div style="font-size:11px;color:var(--m);margin-bottom:8px">Last updated by: <b>'+esc(audit.user)+'</b> on '+esc(audit.time)+'</div>';
+  }
+
+  h+='<table>'+
+  '<tr><th>Subject</th><th>PT1(10)</th><th>SEA1(10)</th><th>UT1(40)</th><th>PT2(10)</th><th>SEA2(10)</th><th>Half(70)</th><th>T1(100)</th><th>PT3(10)</th><th>SEA3(10)</th><th>UT2(40)</th><th>PT4(10)</th><th>SEA4(10)</th><th>Ann(70)</th><th>T2(100)</th><th>Grand</th></tr>'+
+  S.map(function(s,r){
+    var a=m[s]||[];
+    return'<tr><td><b>'+esc(s)+'</b></td>'+
+      [0,1,2,3,4,5].map(function(j){
+        var cKey=s+'_'+j;
+        var hasVal=(a[j]!=='' && a[j]!=null);
+        var locked = hasVal && (cellLocks[cKey] || !!audit.user);
+        return mi(r,j,a[j],locked,cKey,isAdmin);
+      }).join('')+
+      '<td id="t1_'+r+'" style="font-weight:700;color:var(--a2)"></td>'+
+      [6,7,8,9,10,11].map(function(j){
+        var cKey=s+'_'+j;
+        var hasVal=(a[j]!=='' && a[j]!=null);
+        var locked = hasVal && (cellLocks[cKey] || !!audit.user);
+        return mi(r,j,a[j],locked,cKey,isAdmin);
+      }).join('')+
+      '<td id="t2_'+r+'" style="font-weight:700;color:var(--a2)"></td><td id="tot_'+r+'" style="font-weight:800"></td></tr>';
+  }).join('')+'</table></div>';
+
+  var coSubjs=getCoSubj(e.cls, e.lang);
+  h+='<div class="box"><b>Co-Scholastic (Term 1 / Term 2)</b><div class="g" style="margin-top:8px">'+
+  coSubjs.map(function(a,i){
+    var v1=cg[2*i]||'', v2=cg[2*i+1]||'';
+    var l1=!!v1, l2=!!v2;
+    return'<div><label>'+esc(a)+'</label><div style="display:flex;gap:4px">'+
+      '<span style="font-size:10px;color:var(--m);align-self:center">T1</span>'+cgs(v1,l1,isAdmin)+
+      '<span style="font-size:10px;color:var(--m);align-self:center">T2</span>'+cgs(v2,l2,isAdmin)+
+    '</div></div>';
+  }).join('')+'</div></div>';
+
+  var attLocked = (e.att!=='' && e.att!=null);
+  h+='<div class="box"><div class="g">'+
+    '<div><label>Attendance %</label><input id="att" type="number" step="0.01" value="'+esc(e.att||'')+'" '+(attLocked?'disabled class="cell-locked"':'')+' ondblclick="'+(isAdmin?'adminUnlockSingle(this)':'')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Class Teacher\u2019s Remarks (Leave blank to Auto-Generate)</label><input id="rem" value="'+esc(e.rem||'')+'"></div>'+
+  '</div>'+
+  '<button class="btn" onclick="saveM()">Save Marks &amp; Lock Entered Cells</button>';
+
+  if(isAdmin){
+    h+='<button class="btn g2" onclick="unlockMarks(\''+esc(kStr)+'\')" style="color:#f87171;border-color:rgba(248,113,113,0.5)">'+ICONS.unlock+' Admin: Unlock All Cells for this Student</button>';
+  }
+  h+='</div>';
+
+  $('v').innerHTML=h;
+  updM(S.length);
+}
+
+function adminUnlockSingle(el){
+  if(CURRENT_USER && CURRENT_USER.role==='admin' && el.disabled){
+    if(confirm('Admin Override: Unlock this specific cell for editing?')){
+      el.disabled=false;
+      el.classList.remove('cell-locked');
+      el.focus();
+    }
+  }
+}
+
+function unlockMarks(kStr){
+  if(!CURRENT_USER || CURRENT_USER.role!=='admin') return;
+  if(confirm('Unlock ALL cells for this student so they can be edited?')){
+    delete D.mk_audit[kStr];
+    var e=curE();
+    if(e){ e.att=''; }
+    save(['mk_audit','en']);
+    var inputs=document.querySelectorAll('.mi, .cg, #att');
+    inputs.forEach(function(inp){inp.disabled=false;inp.classList.remove('cell-locked')});
+    alert('All cells unlocked for editing ' + ICONS.check);
+  }
+}
+
+function mi(r,j,v,locked,cKey,isAdmin){
+  var nLen=getSubj(curE().cls, curE().lang).length;
+  var titleAttr = locked ? (isAdmin ? 'Locked (Double-click as Admin to unlock)' : 'Locked (Contact Admin to modify)') : 'Open for entry';
+  return'<td title="'+titleAttr+'" ondblclick="'+(isAdmin?'var i=this.querySelector(\'input\');if(i)adminUnlockSingle(i)':'')+'">'+
+    '<input class="mi'+(locked?' cell-locked':'')+'" type="number" min="0" max="70" step="any" data-r="'+r+'" data-j="'+j+'" data-ckey="'+esc(cKey)+'" value="'+(v==null?'':v)+'" oninput="updM('+nLen+')"'+(locked?' disabled':'')+'>'+
+  '</td>';
+}
+
+function cgs(v,locked,isAdmin){
+  return'<select class="cg'+(locked?' cell-locked':'')+'"'+(locked?' disabled':'')+' ondblclick="'+(isAdmin?'adminUnlockSingle(this)':'')+'">'+
+    ['','A','B','C'].map(function(o){return'<option'+(o==(v||'')?' selected':'')+'>'+o+'</option>'}).join('')+
+  '</select>';
+}
+
+function updM(n){
+  for(var r=0; r<n; r++){
+    var v=function(j){var el=document.querySelector('.mi[data-r="'+r+'"][data-j="'+j+'"]');return el?n0(el.value):0};
+    var pt1=(v(0)+v(3))/2, sea1=(v(1)+v(4))/2, ut1=v(2)/4, hy=v(5);
+    var t1=pt1+sea1+ut1+hy;
+    var pt2=(v(6)+v(9))/2, sea2=(v(7)+v(10))/2, ut2=v(8)/4, ann=v(11);
+    var t2=pt2+sea2+ut2+ann;
+    if($('t1_'+r))$('t1_'+r).textContent=fmtNum(t1);
+    if($('t2_'+r))$('t2_'+r).textContent=fmtNum(t2);
+    if($('tot_'+r))$('tot_'+r).textContent=fmtNum((t1+t2)/2);
+  }
+}
+
+function saveM(){
+  var e=curE(),S=getSubj(e.cls, e.lang),o={},kStr=key(e.s,e.id);
+  var prevAudit=D.mk_audit[kStr] || {cells:{}};
+  var cellLocks=Object.assign({}, prevAudit.cells||{});
+
+  S.forEach(function(s,r){
+    o[s]=[0,1,2,3,4,5,6,7,8,9,10,11].map(function(j){
+      var x=document.querySelector('.mi[data-r="'+r+'"][data-j="'+j+'"]');
+      var val=(x && x.value!=='') ? +x.value : '';
+      if(val!==''){
+        cellLocks[s+'_'+j]={by:CURRENT_USER.username, at:new Date().toLocaleString()};
+      }else{
+        delete cellLocks[s+'_'+j];
+      }
+      return val;
+    });
+  });
+
+  D.mk[kStr]=o;
+  D.co[kStr]=[].map.call(document.querySelectorAll('.cg'),function(x){return x.value});
+  e.att=$('att').value;
+  var c=calc(e);
+  e.rem=$('rem').value.trim() || (c?getAutoRemarks(c.p):'');
+
+  D.mk_audit[kStr]={user:CURRENT_USER.username, time:new Date().toLocaleString(), cells:cellLocks};
+  save(['mk','co','en','mk_audit']);
+  alert('Marks saved! Filled cells are now locked; empty cells remain open ' + ICONS.check);
+  marks();
+}
+
+/* ============================================================================
+   MARKSHEETS (FINAL & TERM 1)
+   ============================================================================ */
+function msH(e){
+  var s=stu(e.id),c=calc(e),S=getSubj(e.cls, e.lang),m=D.set,g=D.co[key(e.s,e.id)]||[];
+  var logoSrc=m.logo||DEFAULT_LOGO;
+  if(c&&!e.rem) e.rem=getAutoRemarks(c.p);
+  return '<div class="ms">'+
+  '<div>'+
+    '<div class="ms-hd">'+
+      '<img src="'+logoSrc+'" class="ms-logo" alt="Logo">'+
+      '<div class="ms-hd-txt">'+
+        '<h1>'+esc(m.school)+'</h1>'+
+        '<div class="sub">'+esc(m.addr)+'<br>Website: '+esc(m.web)+'<br>Phone: '+esc(m.ph)+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<table>'+
+      '<tr><th class="tl" colspan="2">STUDENT PROFILE:</th><th class="nw" style="width:28%">SESSION: '+esc(e.s)+'</th></tr>'+
+      '<tr><td class="lt" colspan="3"><b>Student\u2019s Name: &nbsp;'+esc(s.name)+'</b>'+(s.aadhaar?' &nbsp;&nbsp;|&nbsp;&nbsp; <b>Aadhaar No.:</b> '+esc(s.aadhaar):'')+'</td></tr>'+
+      '<tr><td class="tl" style="width:36%"><b>&nbsp;'+esc(CL[e.cls])+(e.sec?' ('+esc(e.sec)+')':'')+'</b></td><td class="tl" style="width:36%"><b>Roll Number: &nbsp;'+pad(e.roll||0,2)+'</b></td><td class="tl"><b>Date of Birth: &nbsp;'+fd(s.dob)+'</b></td></tr>'+
+    '</table>'+
+    '<table>'+
+      '<tr><th rowspan="2" style="width:18%">SCHOLASTIC<br>AREA</th><th colspan="5" rowspan="2">TERM 1 (100 MARKS)</th><th colspan="5" rowspan="2">TERM 2 (100 MARKS)</th><th colspan="3">OVERALL</th></tr>'+
+      '<tr><th colspan="3" class="nw">TERM 1 (50) + TERM 2 (50)</th></tr>'+
+      '<tr><th class="nw">SUBJECTS</th><th class="nw">PT</th><th class="nw">UT</th><th class="nw">SEA</th><th class="nw">Half<br>Yearly</th><th class="nw">Total</th><th class="nw">PT</th><th class="nw">UT</th><th class="nw">SEA</th><th class="nw">Annual</th><th class="nw">Total</th><th class="nw">Grand<br>Total</th><th class="nw">Grade</th><th class="nw">Highest<br>Marks<br>in Class</th></tr>'+
+      '<tr><td class="sn"></td><td class="mx">10</td><td class="mx">10</td><td class="mx">10</td><td class="mx">70</td><td class="mx">100</td><td class="mx">10</td><td class="mx">10</td><td class="mx">10</td><td class="mx">70</td><td class="mx">100</td><td class="mx">100</td><td class="mx"></td><td class="mx"></td></tr>'+
+      S.map(function(sb,i){
+        var r=c&&c.rows[i];
+        return '<tr><td class="sn">'+esc(sb)+'</td>'+
+          '<td class="nw">'+(r?fmtNum(r.t1_pt):'')+'</td><td class="nw">'+(r?fmtNum(r.t1_ut):'')+'</td><td class="nw">'+(r?fmtNum(r.t1_sea):'')+'</td><td class="nw">'+(r?fmtNum(r.hy):'')+'</td><td class="nw"><b>'+(r?fmtNum(r.t1):'')+'</b></td>'+
+          '<td class="nw">'+(r?fmtNum(r.t2_pt):'')+'</td><td class="nw">'+(r?fmtNum(r.t2_ut):'')+'</td><td class="nw">'+(r?fmtNum(r.t2_sea):'')+'</td><td class="nw">'+(r?fmtNum(r.ann):'')+'</td><td class="nw"><b>'+(r?fmtNum(r.t2):'')+'</b></td>'+
+          '<td class="nw"><b>'+(r?fmtNum(r.g):'')+'</b></td><td class="nw"><b>'+(r?r.gr:'')+'</b></td><td class="nw">'+(c?fmtNum(high(e,i)):'')+'</td></tr>';
+      }).join('')+
+    '</table>'+
+    '<div style="font-size:9.8px;text-align:center;margin:3px 0;color:#000"><b>8 Point Grading Scale:</b> (90% &lt; A1 &lt; 100%), (80% &lt; A2 &lt; 90%), (70% &lt; B1 &lt; 80%), (60% &lt; B2 &lt; 70%), (50% &lt; C1 &lt; 60%), (40% &lt; C2 &lt; 50%), (33% &lt; D &lt; 40%), (E &lt; 33%); *PT = Periodic Test, UT = Unit Test, SEA = Subject Enrichment Activity.</div>'+
+    '<div class="sm">'+
+      '<div class="sm-item"><span>Overall Marks:</span><b>'+(c?fmtNum(c.tot):'')+'</b></div>'+
+      '<div class="sm-item"><span>Percentage:</span><b>'+(c?c.p.toFixed(2)+'%':'')+'</b></div>'+
+      '<div class="sm-item"><span>Grade:</span><b>'+(c?c.gr:'')+'</b></div>'+
+      '<div class="sm-item"><span>Rank:</span><b>'+rank(e)+'</b></div>'+
+    '</div>'+
+  '</div>'+
+  '<div>'+
+    '<table>'+
+      '<tr><th colspan="3">Co-Scholastic Areas<br><span style="font-weight:400;font-size:9.5px">(3 Point Grading Scale A, B, C)</span></th></tr>'+
+      '<tr><td style="width:66%"><b>Area</b></td><td class="nw" style="width:17%"><b>Term 1</b></td><td class="nw" style="width:17%"><b>Term 2</b></td></tr>'+
+      getCoSubj(e.cls, e.lang).map(function(a,i){return'<tr><td class="tl">'+esc(a)+'</td><td class="nw"><b>'+(g[2*i]||'')+'</b></td><td class="nw"><b>'+(g[2*i+1]||'')+'</b></td></tr>'}).join('')+
+      '<tr><td colspan="3" style="font-size:9.5px"><b>Co-Scholastic Area: A = Outstanding, B = Very Good, C = Fair.</b></td></tr>'+
+    '</table>'+
+  '</div>'+
+  '<div>'+
+    '<table>'+
+      '<tr><th class="tl" colspan="2">ATTENDANCE &amp; REMARKS:</th></tr>'+
+      '<tr><td class="tl" style="width:24%"><b>Percentage of Attendance:</b></td><td class="nw"><b>'+(e.att?esc(e.att)+'%':'')+'</b></td></tr>'+
+      '<tr><td class="tl"><b>Class Teacher\u2019s Remarks:</b></td><td style="text-align:left;padding-left:6px"><b>'+esc(e.rem||'')+'</b></td></tr>'+
+    '</table>'+
+    '<div class="ms-sig"><span>Teacher In-Charge</span><span>Co-Ordinator</span><span>Principal</span></div>'+
+  '</div>'+
+  '</div>';
+}
+
+function msv(){
+  setPrintMode('A4');
+  var L=listE();
+  $('v').innerHTML='<div class="box no">'+pick(1)+'<button class="btn" onclick="setPrintMode(\'A4\');print()">'+ICONS.print+' Print Final Marksheet (A4 Portrait)</button></div><div class="sc">'+(L.length?L.map(msH).join(''):'<p style="color:var(--m)">No students found.</p>')+'</div>';
+}
+
+function ms1H(e){
+  var s=stu(e.id),c=calcTerm1(e),S=getSubj(e.cls, e.lang),m=D.set,g=D.co[key(e.s,e.id)]||[];
+  var logoSrc=m.logo||DEFAULT_LOGO;
+  return '<div class="ms">'+
+  '<div>'+
+    '<div class="ms-hd">'+
+      '<img src="'+logoSrc+'" class="ms-logo" alt="Logo">'+
+      '<div class="ms-hd-txt">'+
+        '<h1>'+esc(m.school)+'</h1>'+
+        '<div class="sub">'+esc(m.addr)+'<br>Website: '+esc(m.web)+'<br>Phone: '+esc(m.ph)+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<table>'+
+      '<tr><th class="tl" colspan="2">STUDENT PROFILE (TERM-1 REPORT):</th><th class="nw" style="width:28%">SESSION: '+esc(e.s)+'</th></tr>'+
+      '<tr><td class="lt" colspan="3"><b>Student\u2019s Name: &nbsp;'+esc(s.name)+'</b>'+(s.aadhaar?' &nbsp;&nbsp;|&nbsp;&nbsp; <b>Aadhaar No.:</b> '+esc(s.aadhaar):'')+'</td></tr>'+
+      '<tr><td class="tl" style="width:36%"><b>&nbsp;'+esc(CL[e.cls])+(e.sec?' ('+esc(e.sec)+')':'')+'</b></td><td class="tl" style="width:36%"><b>Roll Number: &nbsp;'+pad(e.roll||0,2)+'</b></td><td class="tl"><b>Date of Birth: &nbsp;'+fd(s.dob)+'</b></td></tr>'+
+    '</table>'+
+    '<table>'+
+      '<tr><th class="nw">SCHOLASTIC AREA (SUBJECTS)</th><th class="nw">PT (10)</th><th class="nw">UT (10)</th><th class="nw">SEA (10)</th><th class="nw">Half-Yearly (70)</th><th class="nw">Term-1 Total (100)</th><th class="nw">Grade</th><th class="nw">Highest in Class</th></tr>'+
+      S.map(function(sb,i){
+        var r=c&&c.rows[i];
+        return '<tr><td class="sn">'+esc(sb)+'</td>'+
+          '<td class="nw">'+(r?fmtNum(r.t1_pt):'')+'</td><td class="nw">'+(r?fmtNum(r.t1_ut):'')+'</td><td class="nw">'+(r?fmtNum(r.t1_sea):'')+'</td><td class="nw">'+(r?fmtNum(r.hy):'')+'</td><td class="nw"><b>'+(r?fmtNum(r.t1):'')+'</b></td><td class="nw"><b>'+(r?r.gr:'')+'</b></td><td class="nw">'+(c?fmtNum(highTerm1(e,i)):'')+'</td></tr>';
+      }).join('')+
+    '</table>'+
+    '<div style="font-size:9.8px;text-align:center;margin:3px 0;color:#000"><b>8 Point Grading Scale:</b> (90% &lt; A1 &lt; 100%), (80% &lt; A2 &lt; 90%), (70% &lt; B1 &lt; 80%), (60% &lt; B2 &lt; 70%), (50% &lt; C1 &lt; 60%), (40% &lt; C2 &lt; 50%), (33% &lt; D &lt; 40%), (E &lt; 33%); *PT = Periodic Test, UT = Unit Test, SEA = Subject Enrichment Activity.</div>'+
+    '<div class="sm">'+
+      '<div class="sm-item"><span>Overall Marks:</span><b>'+(c?fmtNum(c.tot):'')+'</b></div>'+
+      '<div class="sm-item"><span>Percentage:</span><b>'+(c?c.p.toFixed(2)+'%':'')+'</b></div>'+
+      '<div class="sm-item"><span>Grade:</span><b>'+(c?c.gr:'')+'</b></div>'+
+    '</div>'+
+  '</div>'+
+  '<div>'+
+    '<table>'+
+      '<tr><th colspan="2">Co-Scholastic Areas (Term 1)<br><span style="font-weight:400;font-size:9.5px">(3 Point Grading Scale A, B, C)</span></th></tr>'+
+      '<tr><td style="width:75%"><b>Area</b></td><td class="nw" style="width:25%"><b>Grade (Term 1)</b></td></tr>'+
+      getCoSubj(e.cls, e.lang).map(function(a,i){return'<tr><td class="tl">'+esc(a)+'</td><td class="nw"><b>'+(g[2*i]||'')+'</b></td></tr>'}).join('')+
+      '<tr><td colspan="2" style="font-size:9.5px"><b>Co-Scholastic Area: A = Outstanding, B = Very Good, C = Fair.</b></td></tr>'+
+    '</table>'+
+  '</div>'+
+  '<div>'+
+    '<table>'+
+      '<tr><th class="tl" colspan="2">ATTENDANCE &amp; REMARKS (TERM 1):</th></tr>'+
+      '<tr><td class="tl" style="width:24%"><b>Attendance %:</b></td><td class="nw"><b>'+(e.att?esc(e.att)+'%':'')+'</b></td></tr>'+
+      '<tr><td class="tl"><b>Teacher\u2019s Remarks:</b></td><td style="text-align:left;padding-left:6px"><b>'+esc(e.rem||'')+'</b></td></tr>'+
+    '</table>'+
+    '<div class="ms-sig"><span>Teacher In-Charge</span><span>Co-Ordinator</span><span>Principal</span></div>'+
+  '</div>'+
+  '</div>';
+}
+
+function ms1View(){
+  setPrintMode('A4');
+  var L=listE();
+  $('v').innerHTML='<div class="box no">'+pick(1)+'<button class="btn" onclick="setPrintMode(\'A4\');print()">'+ICONS.print+' Print Term 1 Marksheets (A4 Portrait)</button></div><div class="sc">'+(L.length?L.map(ms1H).join(''):'<p style="color:var(--m)">No students found.</p>')+'</div>';
+}
+
+/* ============================================================================
+   A5 LANDSCAPE ADMIT CARD MODULE
+   ============================================================================ */
+function adv(){
+  setPrintMode('A5');
+  var L=listE();
+  var EXAMS=['Unit Test - 1','Half-Yearly Examination','Unit Test - 2','Annual Examination'];
+  $('v').innerHTML='<div class="box no">'+pick(1)+
+    '<div class="g" style="margin-top:8px">'+
+      '<div><label>Exam Name</label><select onchange="D.set.exam=this.value;save([\'set\']);go(\'ad\')">'+EXAMS.map(function(x){return'<option'+(D.set.exam==x?' selected':'')+'>'+esc(x)+'</option>'}).join('')+'</select></div>'+
+      '<div><label>Exam Date</label><input value="'+esc(D.set.ex_date||'')+'" onchange="D.set.ex_date=this.value;save([\'set\']);go(\'ad\')"></div>'+
+      '<div><label>Exam Time</label><input value="'+esc(D.set.ex_time||'')+'" onchange="D.set.ex_time=this.value;save([\'set\']);go(\'ad\')"></div>'+
+    '</div>'+
+    '<button class="btn" onclick="setPrintMode(\'A5\');print()">'+ICONS.print+' Print A5 Landscape Admit Cards</button>'+
+  '</div>'+
+  '<div class="adm-wrap">'+(L.length?L.map(function(e){
+    var s=stu(e.id), m=D.set, logoSrc=m.logo||DEFAULT_LOGO;
+    var clsLabel = e.cls<=2 ? CL[e.cls] : 'Class - '+ROMAN[e.cls];
+    if(e.sec) clsLabel += ' ('+e.sec+')';
+    return '<div class="adm">'+
+      '<div class="adm-top">'+
+        '<img src="'+logoSrc+'" class="adm-logo" alt="Logo">'+
+        '<div class="adm-title-box">'+
+          '<h2>'+esc(m.school)+'</h2>'+
+          '<div class="adm-sub">CBSE Affiliation Standard Curriculum &nbsp;|&nbsp; Academic Session '+esc(e.s)+'</div>'+
+          '<div class="adm-pill">ADMIT CARD &nbsp;|&nbsp; '+esc(m.exam)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-mid">'+
+        '<table class="adm-info">'+
+          '<tr><td>Student Name</td><td>: &nbsp;<b>'+esc(String(s.name||'').toUpperCase())+'</b></td></tr>'+
+          '<tr><td>Class</td><td>: &nbsp;'+esc(clsLabel)+'</td></tr>'+
+          '<tr><td>Roll Number</td><td>: &nbsp;'+pad(e.roll||0,2)+'</td></tr>'+
+          '<tr><td>Exam Date</td><td>: &nbsp;'+esc(m.ex_date||'')+'</td></tr>'+
+          '<tr><td>Exam Time</td><td>: &nbsp;'+esc(m.ex_time||'')+'</td></tr>'+
+        '</table>'+
+        '<div class="adm-photo">'+(s.photo?'<img src="'+esc(s.photo)+'">':'<span style="font-size:11px;color:#666;text-align:center">Student<br>Photo</span>')+'</div>'+
+      '</div>'+
+      '<div class="adm-inst">'+
+        '<b>IMPORTANT CANDIDATE INSTRUCTIONS (CBSE GUIDELINES)</b>'+
+        '<ul>'+
+          '<li>Candidates must produce this Admit Card at the examination gate for verification.</li>'+
+          '<li>Please report to the exam hall at least 15 minutes before the scheduled commencement time.</li>'+
+          '<li>No electronic gadgets, mobile devices, calculators, or unauthorized materials are permitted inside.</li>'+
+          '<li>The student must maintain strict discipline and adhere to the formal dress code of the institution.</li>'+
+        '</ul>'+
+      '</div>'+
+      '<div class="adm-sig"><span>Teacher In-charge</span><span>Exam Co-Ordinator</span><span>Principal / Director</span></div>'+
+    '</div>';
+  }).join(''):'<p style="color:var(--m)">No students found.</p>')+'</div>';
+}
+
+/* ============================================================================
+   STAFF-LINKED USER MANAGEMENT & TAB PERMISSIONS
+   ============================================================================ */
+function userView(){
+  if(!CURRENT_USER||CURRENT_USER.role!='admin'){ $('v').innerHTML='<div class="box">Access Denied. Admins only.</div>'; return; }
+  ED_USER=null;
+  var staffOpts='<option value="">-- Select Staff Member First --</option>'+D.em.map(function(m){
+    return '<option value="'+esc(m.id)+'">'+esc(m.id)+' \u2013 '+esc(m.name)+' ('+esc(m.des)+')</option>';
+  }).join('');
+
+  var tabChecks=ALL_TAB_DEFS.map(function(t){
+    return '<label class="perm-item"><input type="checkbox" class="u_tab_cb" value="'+t[0]+'"'+(t[0]==='hm'?' checked':'')+'> '+esc(t[1])+'</label>';
+  }).join('');
+
+  $('v').innerHTML=
+    '<div class="box">'+
+      '<h3 style="margin-top:0;font-family:var(--font-head)">Create &amp; Manage Staff User Accounts</h3>'+
+      '<p style="color:var(--m);font-size:12.5px;margin-top:-6px">Every portal user must first be registered in the <b>Staff</b> tab. Select the staff member below and assign their allowed module tabs.</p>'+
+      '<div class="g">'+
+        '<div><label>1. Select Staff Member *</label><select id="u_staff" onchange="onSelectStaffForUser(this.value)">'+staffOpts+'</select></div>'+
+        '<div><label>2. Login Username *</label><input id="u_name" placeholder="Auto-filled from Staff ID or custom"></div>'+
+        '<div><label>3. Password *</label><input id="u_pass" type="password" placeholder="Create strong password"></div>'+
+        '<div><label>4. Access Role</label><select id="u_role" onchange="onRolePresetChange(this.value)"><option value="staff">Staff / Teacher (Custom Tab Permissions)</option><option value="admin">Admin (Full Access + Cell Unlock)</option></select></div>'+
+      '</div>'+
+      '<div style="margin-top:14px">'+
+        '<label>5. Assign Allowed Tabs for this User:</label>'+
+        '<div style="margin-bottom:6px"><button type="button" class="mb" onclick="toggleAllPermCbs(true)">Select All Tabs</button> <button type="button" class="mb" onclick="toggleAllPermCbs(false)">Clear All</button></div>'+
+        '<div class="perm-grid">'+tabChecks+'</div>'+
+      '</div>'+
+      '<button class="btn" id="usr_btn" onclick="saveUser()">Save User Account</button>'+
+      '<button class="btn g2" onclick="userView()">Reset</button>'+
+    '</div>'+
+    '<div class="box sc">'+
+      '<h4 style="margin-top:0;font-family:var(--font-head)">Active Portal Users</h4>'+
+      '<table><tr><th>Username</th><th>Linked Staff</th><th>Role</th><th>Assigned Tabs</th><th>Actions</th></tr>'+
+      Object.keys(D.users).map(function(u){
+        var ur=D.users[u];
+        var stMember=ur.staffId ? emp(ur.staffId) : {};
+        var staffLabel=ur.staffId ? (esc(ur.staffId)+' - '+esc(stMember.name||'Unknown')) : (u==='admin'?'Primary System Admin':'Unlinked');
+        var tabNames=(ur.tabs||[]).map(function(tk){
+          var found=ALL_TAB_DEFS.find(function(x){return x[0]===tk});
+          return found?found[1]:tk;
+        }).join(', ');
+        return '<tr><td><b>'+esc(u)+'</b></td><td>'+staffLabel+'</td><td><span class="badge-pill">'+esc((ur.role||'staff').toUpperCase())+'</span></td><td style="white-space:normal;max-width:340px;font-size:12px">'+esc(tabNames)+'</td>'+
+          '<td><button class="mb" onclick="editUser(\''+esc(u)+'\')">Edit</button> '+(u!=='admin'?'<button class="mb d" onclick="delUser(\''+esc(u)+'\')">Del</button>':'')+'</td></tr>';
+      }).join('')+
+      '</table>'+
+    '</div>';
+}
+
+function onSelectStaffForUser(staffId){
+  if(!staffId)return;
+  if(!$('u_name').value || ED_USER===null){
+    $('u_name').value=staffId.toLowerCase();
+  }
+}
+
+function onRolePresetChange(role){
+  if(role==='admin') toggleAllPermCbs(true);
+}
+
+function toggleAllPermCbs(state){
+  document.querySelectorAll('.u_tab_cb').forEach(function(cb){cb.checked=state});
+}
+
+function saveUser(){
+  var staffId=$('u_staff').value;
+  var u=$('u_name').value.trim();
+  var p=$('u_pass').value.trim();
+  var r=$('u_role').value;
+  var checkedTabs=[].filter.call(document.querySelectorAll('.u_tab_cb'),function(cb){return cb.checked}).map(function(cb){return cb.value});
+
+  if(u!=='admin' && !staffId){
+    alert('User must be registered in the Staff tab first. Please select a Staff member.');
+    return;
+  }
+  if(!u||!p){alert('Username and Password are required.');return;}
+  if(!checkedTabs.length){alert('Please assign at least one tab permission.');return;}
+  if(D.users[u] && ED_USER!==u && ED_USER===null){alert('Username already exists.');return;}
+
+  D.users[u]={pass:p, role:r, staffId:staffId, tabs:checkedTabs};
+  if(ED_USER!==null && ED_USER!==u){ delete D.users[ED_USER]; }
+  ED_USER=null;
+  save(['users']);
+  alert('User permissions saved successfully ' + ICONS.check);
+  userView();
+}
+
+function editUser(u){
+  var usr=D.users[u];
+  if(!usr) return;
+  $('u_staff').value=usr.staffId||'';
+  $('u_name').value=u;
+  $('u_pass').value=usr.pass;
+  $('u_role').value=usr.role||'staff';
+  var userTabs=usr.tabs||[];
+  document.querySelectorAll('.u_tab_cb').forEach(function(cb){
+    cb.checked = userTabs.indexOf(cb.value)>-1;
+  });
+  ED_USER=u;
+  $('usr_btn').textContent='Update User Account';
+  scrollTo(0,0);
+}
+
+function delUser(u){
+  if(u==='admin'){alert('Cannot delete primary admin account.');return;}
+  if(confirm('Delete portal user '+u+'?')){
+    delete D.users[u];
+    save(['users']);
+    userView();
+  }
+}
+
+/* ============================================================================
+   SETTINGS, CUSTOM STAFF ROLES, BACKUP & CLOUD SYNC
+   ============================================================================ */
+function sett(){
+  if(!CURRENT_USER||CURRENT_USER.role!='admin'){ $('v').innerHTML='<div class="box">Access Denied. Admins only.</div>'; return; }
+  ensureDefaults();
+  var m=D.set,F=[['school','School Name'],['addr','Address'],['web','Website | Email'],['ph','Phone']];
+  var rolesChips=D.roles.map(function(rl,idx){
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:rgba(99,102,241,0.16);border:1px solid var(--b);font-size:12px;margin:3px">'+
+      esc(rl)+' <b style="cursor:pointer;color:#f87171" title="Remove role" onclick="removeStaffRole('+idx+')">&times;</b></span>';
+  }).join('');
+
+  $('v').innerHTML=
+    '<div class="box"><h3 style="margin-top:0;font-family:var(--font-head)">Institution Profile &amp; Branding</h3><div class="g">'+
+      F.map(function(f){return'<div><label>'+esc(f[1])+'</label><input id="s_'+f[0]+'" value="'+esc(m[f[0]])+'"></div>'}).join('')+
+      '<div><label>Current Active Session</label><select id="s_ses">'+getSessionOptionsHTML(m.ses)+'</select></div>'+
+      '<div><label>School Logo</label><div style="display:flex;gap:4px"><input id="s_logo" value="'+esc(m.logo||'')+'"><label class="mb" style="padding:7px;cursor:pointer">'+ICONS.cam+' Upload<input type="file" accept="image/*" style="display:none" onchange="handleImgUpload(this,\'s_logo\')"></label></div></div>'+
+    '</div><button class="btn" onclick="saveS()">Save Settings</button></div>'+
+
+    '<div class="box"><h3 style="margin-top:0;font-family:var(--font-head)">Add New Staff Role / Designation</h3>'+
+      '<div class="g"><div><label>New Staff Role Title (e.g. Lab Assistant, Sports Coach)</label><input id="new_role_inp" placeholder="Enter role title"></div></div>'+
+      '<button class="btn" onclick="addNewStaffRole()">+ Add Staff Role</button>'+
+      '<div style="margin-top:12px"><label>Configured Staff Roles:</label><div>'+rolesChips+'</div></div>'+
+    '</div>'+
+
+    '<div class="box"><h3 style="margin-top:0;font-family:var(--font-head)">Add New Academic Session</h3>'+
+      '<div class="g"><div><label>New Session (e.g. 2030-31)</label><input id="new_ses_inp" placeholder="YYYY-YY"></div></div>'+
+      '<button class="btn" onclick="addNewSession()">+ Add Session</button>'+
+    '</div>'+
+
+    '<div class="box"><h3 style="margin-top:0;font-family:var(--font-head)">Google Sheet Live Cloud Sync</h3>'+
+      '<div class="g"><div><label>Apps Script Web App URL</label><input id="sy_url" value="'+esc(SY.url)+'"></div><div><label>Secret Sync Key</label><input id="sy_key" type="password" value="'+esc(SY.key)+'"></div></div>'+
+      '<button class="btn" onclick="connect()">Connect &amp; Sync</button>'+
+    '</div>'+
+
+    '<div class="box"><h3 style="margin-top:0;font-family:var(--font-head)">Full Database Backup &amp; Restore</h3>'+
+      '<button class="btn" onclick="bk()">Download Backup JSON</button> '+
+      '<label class="btn g2" style="display:inline-block;cursor:pointer">Restore Backup JSON<input type="file" accept=".json" style="display:none" onchange="rs(event)"></label>'+
+    '</div>';
+}
+
+function addNewStaffRole(){
+  var val=$('new_role_inp').value.trim();
+  if(!val){alert('Please enter a staff role name.');return;}
+  if(D.roles.some(function(r){return r.toLowerCase()===val.toLowerCase()})){
+    alert('This staff role already exists.');return;
+  }
+  D.roles.push(val);
+  save(['roles']);
+  alert('Staff role "'+val+'" added ' + ICONS.check);
+  sett();
+}
+
+function removeStaffRole(idx){
+  if(D.roles.length<=1){alert('At least one staff role must remain.');return;}
+  if(confirm('Remove staff role "'+D.roles[idx]+'"?')){
+    D.roles.splice(idx,1);
+    save(['roles']);
+    sett();
+  }
+}
+
+function addNewSession(){
+  var val=$('new_ses_inp').value.trim();
+  if(!val){alert('Enter session in YYYY-YY format (e.g. 2030-31).');return;}
+  if(D.sessions.indexOf(val)===-1){
+    D.sessions.push(val);
+    save(['sessions']);
+    alert('Session '+val+' added ' + ICONS.check);
+    sett();
+  }else alert('Session already exists.');
+}
+
+function saveS(){
+  ['school','addr','web','ph','ses','logo'].forEach(function(k){D.set[k]=$('s_'+k).value.trim()});
+  M.s=D.set.ses;
+  save(['set']);
+  alert('Settings saved ' + ICONS.check);
+}
+
+function dlf(n,t,y){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:y}));a.download=n;a.click()}
+function bk(){dlf('school-backup.json',JSON.stringify(D),'application/json')}
+function rs(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      D=JSON.parse(r.result);
+      ensureDefaults();
+      save(['set','st','en','mk','co','em','mk_audit','users','sessions','roles']);
+      go('hm');
+      alert('Backup restored ' + ICONS.check);
+    }catch(ex){alert('Invalid backup file.')}
+  };
+  r.readAsText(f);
+}
+
+async function connect(){
+  var u=$('sy_url').value.trim(),k=$('sy_key').value.trim();
+  if(!u||!k){alert('Enter both URL and Secret Key.');return}
+  SY={url:u,key:k};
+  localStorage.setItem('school_sync',JSON.stringify(SY));
+  await pull();
+  alert('Connected to Google Sheet ' + ICONS.check);
+}
+
+function csvExport(k){
+  var rows=[];
+  if(k=='st') rows=[['id','name','dob','gender','able','udise','aadhaar','father','faadhaar','mother','maadhaar','phone','phone2','phone3','wa','email','addr','adm','photo']].concat(D.st.map(function(s){return [s.id,s.name,s.dob,s.gender,s.able,s.udise,s.aadhaar,s.father,s.faadhaar,s.mother,s.maadhaar,s.phone,s.phone2,s.phone3,s.wa,s.email,s.addr,s.adm,s.photo]}));
+  if(k=='en') rows=[['s','id','cls','sec','roll','lang','udise','faadhaar','maadhaar','tuition']].concat(D.en.map(function(e){return [e.s,e.id,e.cls,e.sec,e.roll,e.lang,e.udise,e.faadhaar,e.maadhaar,e.tuition]}));
+  if(k=='em') rows=[['id','name','des','aadhaar','deg','prof','subj','phone','phone2','wa','email','join','addr','photo']].concat(D.em.map(function(m){return [m.id,m.name,m.des,m.aadhaar,m.deg,m.prof,m.subj,m.phone,m.phone2,m.wa,m.email,m.join,m.addr,m.photo]}));
+  dlf(k+'.csv','\ufeff'+rows.map(function(r){return r.map(function(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'text/csv');
+}
+
+function csvImport(e,k){
+  var f=e.target.files[0]; if(!f) return; var r=new FileReader();
+  r.onload=function(ev){
+    var lines=ev.target.result.split('\n').map(function(l){return l.split(',').map(function(v){return v.replace(/^"|"$/g,'').replace(/""/g,'')})});
+    if(lines.length<2) return; var hdr=lines[0];
+    for(var i=1; i<lines.length; i++){
+      var vals=lines[i]; if(vals.length<hdr.length) continue; var obj={};
+      hdr.forEach(function(h,idx){obj[h]=vals[idx]});
+      if(k=='en'){obj.cls=+obj.cls; obj.roll=+obj.roll; obj.s=obj.s||D.set.ses;}
+      D[k].push(obj);
+    }
+    save([k]);
+    if(k==='en') renderEnrollTable(); else tbl(k);
+    alert('CSV Imported successfully ' + ICONS.check);
+  };
+  r.readAsText(f);
+}
+
+boot();
+</script>
+</body></html>
